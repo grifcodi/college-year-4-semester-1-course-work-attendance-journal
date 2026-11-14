@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,14 +8,25 @@ using System.Threading.Tasks;
 
 namespace AttendanceJournal.Data;
 
-internal class DatabaseInitializer
+internal static class DatabaseInitializer
 {
-    public static string GetDatabasePath()
+    public static string GetConnectionString()
     {
-        var folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "AttendanceJournal");
+        var folder = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "AttendanceJournal");
 
         Directory.CreateDirectory(folder);
-        return Path.Combine(folder, "journal.db");
+        var dbPath = Path.Combine(folder, "journal.db");
+
+        var builder = new SqliteConnectionStringBuilder
+        {
+            DataSource = dbPath,
+            Mode = SqliteOpenMode.ReadWriteCreate,
+            DefaultTimeout = 5,
+        };
+
+        return builder.ToString();
     }
 
     public static async Task InitializeAsync(IDbContextFactory<AppDbContext> contextFactory)
@@ -23,6 +35,5 @@ internal class DatabaseInitializer
 
         await context.Database.MigrateAsync();
         await context.Database.ExecuteSqlRawAsync("PRAGMA journal_mode=WAL;");
-        await context.Database.ExecuteSqlRawAsync("PRAGMA busy_timeout=5000;");
     }
 }
