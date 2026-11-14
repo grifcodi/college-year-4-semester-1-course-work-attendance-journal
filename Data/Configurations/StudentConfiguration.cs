@@ -1,0 +1,20 @@
+﻿using AttendanceJournal.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace AttendanceJournal.Data.Configurations;
+
+internal class StudentConfiguration : IEntityTypeConfiguration<Student>
+{
+    public void Configure(EntityTypeBuilder<Student> builder)
+    {
+        builder.Property(s => s.FullName)
+            .HasMaxLength(150)
+            .IsRequired();
+
+        builder.HasIndex(s => new { s.StudentGroupId, s.IsArchived, s.FullName });
+    }
+}
