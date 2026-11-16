@@ -4,7 +4,7 @@ using System.Text;
 
 namespace AttendanceJournal.Models;
 
-internal class AttendanceRecord
+public class AttendanceRecord
 {
     public int AttendanceRecordId { get; set; }
     public int LessonId { get; set; }

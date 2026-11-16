@@ -4,7 +4,7 @@ using System.Text;
 
 namespace AttendanceJournal.Models;
 
-internal enum AuditEntityType
+public enum AuditEntityType
 {
     StudentGroup,
     Student,

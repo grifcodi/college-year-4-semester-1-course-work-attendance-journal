@@ -4,7 +4,7 @@ using System.Text;
 
 namespace AttendanceJournal.Models;
 
-internal class StudentGroup
+public class StudentGroup
 {
     public int StudentGroupId { get; set; }
     public string Name { get; set; } = string.Empty;

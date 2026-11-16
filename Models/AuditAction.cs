@@ -4,7 +4,7 @@ using System.Text;
 
 namespace AttendanceJournal.Models;
 
-internal enum AuditAction
+public enum AuditAction
 {
     Create,
     Update,

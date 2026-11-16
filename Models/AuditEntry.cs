@@ -4,7 +4,7 @@ using System.Text;
 
 namespace AttendanceJournal.Models;
 
-internal class AuditEntry
+public class AuditEntry
 {
     public int AuditEntryId { get; set; }
     public DateTime TimeStamp { get; set; }

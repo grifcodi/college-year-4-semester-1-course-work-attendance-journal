@@ -4,7 +4,7 @@ using System.Text;
 
 namespace AttendanceJournal.Models;
 
-internal class Setting
+public class Setting
 {
     public string Key { get; set; } = string.Empty;
     public string Value { get; set; } = string.Empty;

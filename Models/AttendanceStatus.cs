@@ -4,7 +4,7 @@ using System.Text;
 
 namespace AttendanceJournal.Models;
 
-internal enum AttendanceStatus
+public enum AttendanceStatus
 {
     Present,
     Absent,
