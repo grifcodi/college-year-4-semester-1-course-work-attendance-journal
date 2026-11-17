@@ -10,18 +10,19 @@ namespace AttendanceJournal.Data;
 
 internal static class DatabaseInitializer
 {
-    public static string GetConnectionString()
+    public static string GetDatabasePath()
     {
         var folder = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "AttendanceJournal");
+             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+             "AttendanceJournal");
 
-        Directory.CreateDirectory(folder);
-        var dbPath = Path.Combine(folder, "journal.db");
-
+        return Path.Combine(folder, "journal.db");
+    }
+    public static string GetConnectionString()
+    {
         var builder = new SqliteConnectionStringBuilder
         {
-            DataSource = dbPath,
+            DataSource = GetDatabasePath(),
             Mode = SqliteOpenMode.ReadWriteCreate,
             DefaultTimeout = 5,
         };
@@ -31,6 +32,13 @@ internal static class DatabaseInitializer
 
     public static async Task InitializeAsync(IDbContextFactory<AppDbContext> contextFactory)
     {
+        var dbPath = GetDatabasePath();
+        var directory = Path.GetDirectoryName(dbPath);
+        if (!string.IsNullOrEmpty(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+
         await using var context = await contextFactory.CreateDbContextAsync();
 
         await context.Database.MigrateAsync();

@@ -13,7 +13,7 @@ public class AttendanceVersion
     public string? Note { get; set; }
     public int? Grade { get; set; }
     public string? Reason { get; set; }
-    public DateTime Timestamp { get; set; }
+    public DateTime TimeStamp { get; set; }
 
     public AttendanceRecord AttendanceRecord { get; set; } = null!;
 }

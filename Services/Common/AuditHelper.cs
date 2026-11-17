@@ -8,7 +8,7 @@ using System.Text.Unicode;
 
 namespace AttendanceJournal.Services.Common;
 
-internal class AuditHelper
+internal static class AuditHelper
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
