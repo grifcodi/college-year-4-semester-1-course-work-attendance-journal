@@ -161,7 +161,7 @@ namespace AttendanceJournal.Data.Migrations
                     Note = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
                     Grade = table.Column<int>(type: "INTEGER", nullable: true),
                     Reason = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
-                    Timestamp = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    TimeStamp = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {

@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AttendanceJournal.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20261114211659_InitialCreate")]
+    [Migration("20261117203415_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -67,7 +67,7 @@ namespace AttendanceJournal.Data.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("Timestamp")
+                    b.Property<DateTime>("TimeStamp")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("VersionNumber")

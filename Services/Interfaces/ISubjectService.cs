@@ -1,7 +1,4 @@
-﻿
-
-
-using AttendanceJournal.Models;
+﻿using AttendanceJournal.Models;
 using AttendanceJournal.Services.Common;
 using System.Collections.Generic;
 using System.Threading.Tasks;

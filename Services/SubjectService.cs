@@ -3,16 +3,14 @@ using AttendanceJournal.Models;
 using AttendanceJournal.Services.Common;
 using AttendanceJournal.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using SkiaSharp;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace AttendanceJournal.Services;
 
-public class SubjectService(IDbContextFactory<AppDbContext> dbContextFactory) : ServiceBase(dbContextFactory), ISubjectService
+public class SubjectService(IDbContextFactory<AppDbContext> dbContextFactory)
+    : ServiceBase(dbContextFactory), ISubjectService
 {
     public async Task<List<Subject>> GetAllAsync(bool includeArchived = false)
     {
@@ -27,12 +25,12 @@ public class SubjectService(IDbContextFactory<AppDbContext> dbContextFactory) : 
 
     public async Task<Result<Subject>> CreateAsync(string name)
     {
-        var validatrion = ValidateAndNormalizeName(name);
+        var validation = ValidateAndNormalizeName(name);
 
-        if (!validatrion.IsSuccess)
-            return Result<Subject>.Failure(validatrion.ErrorKey!, validatrion.ErrorArgs);
+        if (!validation.IsSuccess)
+            return Result<Subject>.Failure(validation.ErrorKey!, validation.ErrorArgs);
 
-        var (trimmed, normalized) = validatrion.Value;
+        var (trimmed, normalized) = validation.Value;
 
         return await ExecuteInTransactionAsync(async context =>
         {
@@ -65,7 +63,7 @@ public class SubjectService(IDbContextFactory<AppDbContext> dbContextFactory) : 
     {
         var validation = ValidateAndNormalizeName(newName);
         if (!validation.IsSuccess)
-            return Result<Subject>.Failure(ErrorKeys.EntityNotFound);
+            return Result<Subject>.Failure(validation.ErrorKey!, validation.ErrorArgs);
 
         var (trimmed, normalized) = validation.Value;
 
@@ -98,8 +96,8 @@ public class SubjectService(IDbContextFactory<AppDbContext> dbContextFactory) : 
         }, ErrorKeys.SubjectAlreadyExists, trimmed);
     }
 
-    public async Task<Result> ArchiveAsync(int subjectId) => await SetArchiveStateAsync(subjectId, true);
-    public async Task<Result> UnarchiveAsync(int subjectId) => await SetArchiveStateAsync(subjectId, false);
+    public Task<Result> ArchiveAsync(int subjectId) => SetArchiveStateAsync(subjectId, true);
+    public Task<Result> UnarchiveAsync(int subjectId) => SetArchiveStateAsync(subjectId, false);
 
     private Task<Result> SetArchiveStateAsync(int subjectId, bool isArchived)
     {
@@ -134,8 +132,8 @@ public class SubjectService(IDbContextFactory<AppDbContext> dbContextFactory) : 
         if (string.IsNullOrWhiteSpace(trimmed))
             return Result<(string, string)>.Failure(ErrorKeys.SubjectNameRequired);
 
-        if (trimmed.Length > 150)
-            return Result<(string, string)>.Failure(ErrorKeys.SubjectNameTooLong, 150);
+        if (trimmed.Length > ValidationConstants.SubjectNameMaxLength)
+            return Result<(string, string)>.Failure(ErrorKeys.SubjectNameTooLong, ValidationConstants.SubjectNameMaxLength);
 
         return Result<(string, string)>.Success((trimmed, trimmed.ToUpperInvariant()));
     }

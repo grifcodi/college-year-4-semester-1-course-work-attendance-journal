@@ -13,14 +13,13 @@ internal class AttendanceVersionConfiguration : IEntityTypeConfiguration<Attenda
     {
         builder.Property(av => av.Status)
             .HasConversion<string>()
-            .HasMaxLength(20)
             .IsRequired();
 
         builder.Property(av => av.Note)
-            .HasMaxLength(500);
+            .HasMaxLength(ValidationConstants.NoteMaxLength);
 
         builder.Property(av => av.Reason)
-            .HasMaxLength(500);
+            .HasMaxLength(ValidationConstants.ReasonMaxLength);
 
         builder.HasIndex(av => new { av.AttendanceRecordId, av.VersionNumber })
             .IsUnique();

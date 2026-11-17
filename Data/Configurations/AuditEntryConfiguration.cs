@@ -13,12 +13,10 @@ internal class AuditEntryConfiguration : IEntityTypeConfiguration<AuditEntry>
     {
         builder.Property(ae => ae.Action)
             .HasConversion<string>()
-            .HasMaxLength(30)
             .IsRequired();
 
         builder.Property(ae => ae.EntityType)
             .HasConversion<string>()
-            .HasMaxLength(30)
             .IsRequired();
 
         builder.Property(ae => ae.PayloadJson)

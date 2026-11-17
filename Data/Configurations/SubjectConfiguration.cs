@@ -12,11 +12,11 @@ internal class SubjectConfiguration : IEntityTypeConfiguration<Subject>
     public void Configure(EntityTypeBuilder<Subject> builder)
     {
         builder.Property(s => s.Name)
-            .HasMaxLength(150)
+            .HasMaxLength(ValidationConstants.SubjectNameMaxLength)
             .IsRequired();
 
         builder.Property(s => s.NormalizedName)
-            .HasMaxLength(150)
+            .HasMaxLength(ValidationConstants.SubjectNameMaxLength)
             .IsRequired();
 
         builder.HasIndex(s => s.NormalizedName)

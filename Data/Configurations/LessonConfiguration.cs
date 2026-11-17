@@ -12,7 +12,7 @@ internal class LessonConfiguration : IEntityTypeConfiguration<Lesson>
     public void Configure(EntityTypeBuilder<Lesson> builder)
     {
         builder.Property(l => l.Topic)
-            .HasMaxLength(250);
+            .HasMaxLength(ValidationConstants.LessonTopicMaxLength);
 
         builder.HasIndex(l => new { l.StudentGroupId, l.Date, l.PairNumber })
             .IsUnique();

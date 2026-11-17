@@ -15,7 +15,7 @@ public static class ErrorKeys
 
     public const string GroupNameRequired = "Err_Group_NameRequired";
     public const string GroupNameTooLong = "Err_Group_NameTooLong";
-    public const string GroupYearReqired = "Err_Group_YearRequired";
+    public const string GroupYearRequired = "Err_Group_YearRequired";
     public const string GroupYearTooLong = "Err_Group_YearTooLong";
     public const string GroupAlreadyExists = "Err_Group_AlreadyExists";
     public const string GroupUnarchiveConflict = "Err_Group_UnarchiveConflict";

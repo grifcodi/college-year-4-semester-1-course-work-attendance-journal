@@ -12,15 +12,15 @@ internal class StudentGroupConfiguration : IEntityTypeConfiguration<StudentGroup
    public void Configure(EntityTypeBuilder<StudentGroup> builder)
     {
         builder.Property(sg => sg.Name)
-            .HasMaxLength(100)
+            .HasMaxLength(ValidationConstants.GroupNameMaxLength)
             .IsRequired();
 
         builder.Property(sg => sg.NormalizedName)
-            .HasMaxLength(100)
+            .HasMaxLength(ValidationConstants.GroupNameMaxLength)
             .IsRequired();
 
         builder.Property(g => g.AcademicYear)
-            .HasMaxLength(20)
+            .HasMaxLength(ValidationConstants.AcademicYearMaxLength)
             .IsRequired();
 
         builder.HasIndex(sg => sg.NormalizedName)
