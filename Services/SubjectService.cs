@@ -3,9 +3,6 @@ using AttendanceJournal.Models;
 using AttendanceJournal.Services.Common;
 using AttendanceJournal.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace AttendanceJournal.Services;
 
@@ -135,6 +132,8 @@ public class SubjectService(IDbContextFactory<AppDbContext> dbContextFactory)
         if (trimmed.Length > ValidationConstants.SubjectNameMaxLength)
             return Result<(string, string)>.Failure(ErrorKeys.SubjectNameTooLong, ValidationConstants.SubjectNameMaxLength);
 
-        return Result<(string, string)>.Success((trimmed, trimmed.ToUpperInvariant()));
+        return Result<(string, string)>.Success((
+            trimmed, 
+            NameNormalizer.Normalize(trimmed)));
     }
 }

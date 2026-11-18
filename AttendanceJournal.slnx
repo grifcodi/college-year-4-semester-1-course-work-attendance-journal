@@ -1,6 +1,4 @@
 <Solution>
-  <Folder Name="/docs/" />
-  <Folder Name="/samples/" />
-  <Folder Name="/tests/" />
   <Project Path="AttendanceJournal.csproj" />
+  <Project Path="Tests/AttendanceJournal.Tests/AttendanceJournal.Tests.csproj" />
 </Solution>

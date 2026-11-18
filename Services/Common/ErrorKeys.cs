@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace AttendanceJournal.Services.Common;
+﻿namespace AttendanceJournal.Services.Common;
 
 public static class ErrorKeys
 {

@@ -106,6 +106,7 @@ public class StudentGroupService(IDbContextFactory<AppDbContext> dbContextFactor
     public Task<Result> UnarchiveAsync(int groupId) => SetGroupArchiveStateAsync(groupId, false);
     private Task<Result> SetGroupArchiveStateAsync(int groupId, bool isArchived)
     {
+
         return ExecuteInTransactionAsync(async context =>
         {
             var group = await context.StudentGroups.FindAsync(groupId);
@@ -117,9 +118,9 @@ public class StudentGroupService(IDbContextFactory<AppDbContext> dbContextFactor
 
             if (!isArchived)
             {
-                var conflixtExists = await context.StudentGroups
+                var conflictExists = await context.StudentGroups
                     .AnyAsync(g => g.StudentGroupId != groupId && !g.IsArchived && g.NormalizedName == group.NormalizedName);
-                if (conflixtExists)
+                if (conflictExists)
                     return Result.Failure(ErrorKeys.GroupUnarchiveConflict, group.Name);
             }
 
@@ -151,6 +152,9 @@ public class StudentGroupService(IDbContextFactory<AppDbContext> dbContextFactor
         if (trimmedYear.Length > ValidationConstants.AcademicYearMaxLength)
             return Result<(string, string, string)>.Failure(ErrorKeys.GroupYearTooLong, ValidationConstants.AcademicYearMaxLength);
 
-        return Result<(string, string, string)>.Success((trimmedName, trimmedName.ToUpperInvariant(), trimmedYear));
+        return Result<(string, string, string)>.Success((
+            trimmedName, 
+            NameNormalizer.Normalize(trimmedName), 
+            trimmedYear));
     }
 }
