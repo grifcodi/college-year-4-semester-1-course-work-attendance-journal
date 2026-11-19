@@ -21,6 +21,8 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ISubjectService, SubjectService>();
         services.AddSingleton<IStudentGroupService, StudentGroupService>();
         services.AddSingleton<IStudentService, StudentService>();
+        services.AddSingleton<ILessonService, LessonService>();
+        services.AddSingleton<IAttendanceService, AttendanceService>();
         services.AddSingleton<IErrorLog, FileErrorLog>();
 
         services.AddSingleton<IConfirmationService, DialogConfirmationService>();

@@ -67,6 +67,19 @@ public static class Localizer
         [UiTextKeys.ShowArchivedStudentsFilter] = "Показати відрахованих / архів",
         [UiTextKeys.StudentFullNamePlaceholder] = "ПІБ студента (Прізвище Ім'я По батькові)",
         [UiTextKeys.SaveStudentButton] = "Зберегти студента",
+
+        [ErrorKeys.LessonInvalidPairNumber] = "Номер пари має бути від 1 до 8.",
+        [ErrorKeys.LessonTopicTooLong] = "Тема заняття занадто довга. Максимум — {0} символів, скоротіть її.",
+        [ErrorKeys.LessonDuplicateSlot] = "Для цієї групи вже існує заняття на {0} (пара №{1}). Оберіть інший номер пари або дату.",
+
+        [ErrorKeys.AttendanceInvalidGrade] = "Оцінка має бути цілим числом від 0 до 100.",
+        [ErrorKeys.AttendanceNoteTooLong] = "Примітка занадто довга. Максимум — {0} символів.",
+        [ErrorKeys.AttendanceReasonRequired] = "Вкажіть причину редагування відмітки.",
+        [ErrorKeys.AttendanceReasonTooShort] = "Причина редагування занадто коротка. Мінімум — {0} символів.",
+        [ErrorKeys.AttendanceReasonTooLong] = "Причина редагування занадто довга. Максимум — {0} символів.",
+        [ErrorKeys.AttendanceStudentArchived] = "Студент перебуває в архіві та не може бути відмічений на новому занятті.",
+        [ErrorKeys.AttendanceStudentWrongGroup] = "Студент не належить до групи цього заняття.",
+        [ErrorKeys.AttendanceVersionNotFound] = "Вказану версію запису відвідуваності не знайдено.",
     };
 
     private static readonly Dictionary<string, string> EnStrings = new()
@@ -116,6 +129,19 @@ public static class Localizer
         [UiTextKeys.ShowArchivedStudentsFilter] = "Show archived",
         [UiTextKeys.StudentFullNamePlaceholder] = "Student's full name",
         [UiTextKeys.SaveStudentButton] = "Save student",
+
+        [ErrorKeys.LessonInvalidPairNumber] = "Pair number must be between 1 and 8.",
+        [ErrorKeys.LessonTopicTooLong] = "The lesson topic is too long. The maximum is {0} characters; shorten it.",
+        [ErrorKeys.LessonDuplicateSlot] = "A lesson for this group already exists on {0} (pair #{1}). Choose another pair number or date.",
+
+        [ErrorKeys.AttendanceInvalidGrade] = "Grade must be an integer between 0 and 100.",
+        [ErrorKeys.AttendanceNoteTooLong] = "The note is too long. The maximum is {0} characters.",
+        [ErrorKeys.AttendanceReasonRequired] = "Enter a reason for editing the attendance mark.",
+        [ErrorKeys.AttendanceReasonTooShort] = "The edit reason is too short. The minimum is {0} characters.",
+        [ErrorKeys.AttendanceReasonTooLong] = "The edit reason is too long. The maximum is {0} characters.",
+        [ErrorKeys.AttendanceStudentArchived] = "The student is archived and cannot be marked in new lessons.",
+        [ErrorKeys.AttendanceStudentWrongGroup] = "The student does not belong to this lesson's group.",
+        [ErrorKeys.AttendanceVersionNotFound] = "The specified attendance record version was not found.",
     };
 
     public static string TranslateError(Result result, AppLanguage? language = null)
