@@ -28,6 +28,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<GroupListViewModel>();
         services.AddTransient<StudentListViewModel>();
         services.AddTransient<GroupsPageViewModel>();
+        services.AddTransient<MainViewModel>();
 
         return services;
     }

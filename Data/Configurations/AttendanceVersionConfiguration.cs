@@ -8,6 +8,10 @@ internal class AttendanceVersionConfiguration : IEntityTypeConfiguration<Attenda
 {
     public void Configure(EntityTypeBuilder<AttendanceVersion> builder)
     {
+        builder.ToTable(t => t.HasCheckConstraint(
+            "CK_ATtendanceVersions_Grade",
+            "[Grade] IS NULL OR ([Grade] >= 0 AND [Grade] <= 100)"));
+
         builder.Property(av => av.Status)
             .HasConversion<string>()
             .IsRequired();

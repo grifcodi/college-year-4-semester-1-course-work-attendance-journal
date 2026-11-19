@@ -30,7 +30,7 @@ public partial class App : Application
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            var vm = ServiceProvider.GetRequiredService<GroupsPageViewModel>();
+            var vm = ServiceProvider.GetRequiredService<MainViewModel>();
             desktop.MainWindow = new MainWindow { DataContext = vm };
             desktop.Exit += (_, _) => (ServiceProvider as IDisposable)?.Dispose();
 
@@ -40,7 +40,7 @@ public partial class App : Application
         base.OnFrameworkInitializationCompleted();
     }
 
-    private async Task StartAsync(GroupsPageViewModel vm)
+    private async Task StartAsync(MainViewModel vm)
     {
         try
         {

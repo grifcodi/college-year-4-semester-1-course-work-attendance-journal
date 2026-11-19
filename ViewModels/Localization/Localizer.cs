@@ -1,16 +1,24 @@
-﻿using AttendanceJournal.Services.Common;
+﻿using AttendanceJournal.Models;
+using AttendanceJournal.Services.Common;
 
 namespace AttendanceJournal.ViewModels.Localization;
 
-public enum AppLanguage
-{
-    Uk,
-    En
-}
-
 public static class Localizer
 {
-    public static AppLanguage CurrentLanguage { get; set; } = AppLanguage.Uk;
+    private static AppLanguage _currentLanguage = AppLanguage.Uk;
+
+    public static AppLanguage CurrentLanguage
+    {
+        get => _currentLanguage;
+        set
+        {
+            if (_currentLanguage == value)
+                return;
+
+            _currentLanguage = value;
+            LocalizationSource.Instance.NotifyLanguageChanged();
+        }
+    }
 
     private static readonly Dictionary<string, string> UkStrings = new()
     {
@@ -39,6 +47,26 @@ public static class Localizer
         [UiTextKeys.ConfirmNo] = "Ні",
         [UiTextKeys.ConfirmArchiveGroup] = "Заархівувати групу «{0}»? Вона зникне зі списків вибору, але всі дані збережуться.",
         [UiTextKeys.ConfirmArchiveStudent] = "Заархівувати студента «{0}»? Він не показуватиметься в нових заняттях, але історія збережеться.",
+
+        [UiTextKeys.AppTitle] = "Електронний журнал обліку відвідуваності",
+        [UiTextKeys.NavHeader] = "Журнал",
+        [UiTextKeys.NavGroups] = "Групи та студенти",
+        [UiTextKeys.RetryButton] = "Повторити",
+
+        [UiTextKeys.GroupsHeader] = "Групи",
+        [UiTextKeys.ArchiveFilter] = "Архів",
+        [UiTextKeys.GroupNamePlaceholder] = "Назва групи (напр. ІПЗ-21)",
+        [UiTextKeys.AcademicYearPlaceholder] = "Навчальний рік (напр. 2026-2027)",
+        [UiTextKeys.SaveButton] = "Зберегти",
+        [UiTextKeys.CancelButton] = "Скасувати",
+        [UiTextKeys.EditButton] = "Редагувати",
+        [UiTextKeys.ArchiveRestoreButton] = "Архів / Відновити",
+        [UiTextKeys.ArchivedBadge] = "АРХІВ",
+
+        [UiTextKeys.StudentsHeader] = "Студенти обраної групи",
+        [UiTextKeys.ShowArchivedStudentsFilter] = "Показати відрахованих / архів",
+        [UiTextKeys.StudentFullNamePlaceholder] = "ПІБ студента (Прізвище Ім'я По батькові)",
+        [UiTextKeys.SaveStudentButton] = "Зберегти студента",
     };
 
     private static readonly Dictionary<string, string> EnStrings = new()
@@ -68,6 +96,26 @@ public static class Localizer
         [UiTextKeys.ConfirmNo] = "No",
         [UiTextKeys.ConfirmArchiveGroup] = "Archive group “{0}”? It will disappear from the pickers, but all its data is kept.",
         [UiTextKeys.ConfirmArchiveStudent] = "Archive student “{0}”? They will not appear in new lessons, but their history is kept.",
+
+        [UiTextKeys.AppTitle] = "Electronic Attendance Journal",
+        [UiTextKeys.NavHeader] = "Journal",
+        [UiTextKeys.NavGroups] = "Groups & Students",
+        [UiTextKeys.RetryButton] = "Retry",
+
+        [UiTextKeys.GroupsHeader] = "Groups",
+        [UiTextKeys.ArchiveFilter] = "Archive",
+        [UiTextKeys.GroupNamePlaceholder] = "Group name (e.g. SE-21)",
+        [UiTextKeys.AcademicYearPlaceholder] = "Academic year (e.g. 2026-2027)",
+        [UiTextKeys.SaveButton] = "Save",
+        [UiTextKeys.CancelButton] = "Cancel",
+        [UiTextKeys.EditButton] = "Edit",
+        [UiTextKeys.ArchiveRestoreButton] = "Archive / Restore",
+        [UiTextKeys.ArchivedBadge] = "ARCHIVED",
+
+        [UiTextKeys.StudentsHeader] = "Students in Selected Group",
+        [UiTextKeys.ShowArchivedStudentsFilter] = "Show archived",
+        [UiTextKeys.StudentFullNamePlaceholder] = "Student's full name",
+        [UiTextKeys.SaveStudentButton] = "Save student",
     };
 
     public static string TranslateError(Result result, AppLanguage? language = null)

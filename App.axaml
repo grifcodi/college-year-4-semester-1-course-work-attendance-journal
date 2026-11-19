@@ -1,13 +1,31 @@
 ﻿<Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="AttendanceJournal.App"
              xmlns:local="using:AttendanceJournal"
+             x:Class="AttendanceJournal.App"
              RequestedThemeVariant="Default">
-             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
     <Application.DataTemplates>
         <local:ViewLocator />
     </Application.DataTemplates>
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="ErrorBannerBackgroundBrush" Color="#FDE8E8" />
+                    <SolidColorBrush x:Key="ErrorBannerBorderBrush" Color="#F8B4B4" />
+                    <SolidColorBrush x:Key="ErrorBannerTextBrush" Color="#9B1C1C" />
+                    <SolidColorBrush x:Key="WarningBadgeBrush" Color="#B45309" />
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="ErrorBannerBackgroundBrush" Color="#3F1D1D" />
+                    <SolidColorBrush x:Key="ErrorBannerBorderBrush" Color="#7F1D1D" />
+                    <SolidColorBrush x:Key="ErrorBannerTextBrush" Color="#FCA5A5" />
+                    <SolidColorBrush x:Key="WarningBadgeBrush" Color="#FBBF24" />
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
 
     <Application.Styles>
         <FluentTheme />

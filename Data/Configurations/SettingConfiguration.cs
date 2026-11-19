@@ -19,8 +19,8 @@ internal class SettingConfiguration : IEntityTypeConfiguration<Setting>
             .IsRequired();
 
         builder.HasData(
-            new Setting { Key = "Language", Value = "uk-UA" },
-            new Setting { Key = "Theme", Value = "Light" }
+            new Setting { Key = "Language", Value = nameof(AppLanguage.Uk) },
+            new Setting { Key = "Theme", Value = nameof(AppTheme.Light) }
         );
     }
 }

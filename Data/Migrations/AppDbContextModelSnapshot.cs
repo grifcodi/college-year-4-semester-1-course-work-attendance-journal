@@ -61,7 +61,6 @@ namespace AttendanceJournal.Data.Migrations
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasMaxLength(20)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("TimeStamp")
@@ -75,7 +74,10 @@ namespace AttendanceJournal.Data.Migrations
                     b.HasIndex("AttendanceRecordId", "VersionNumber")
                         .IsUnique();
 
-                    b.ToTable("AttendanceVersions");
+                    b.ToTable("AttendanceVersions", t =>
+                        {
+                            t.HasCheckConstraint("CK_ATtendanceVersions_Grade", "[Grade] IS NULL OR ([Grade] >= 0 AND [Grade] <= 100)");
+                        });
                 });
 
             modelBuilder.Entity("AttendanceJournal.Models.AuditEntry", b =>
@@ -86,7 +88,6 @@ namespace AttendanceJournal.Data.Migrations
 
                     b.Property<string>("Action")
                         .IsRequired()
-                        .HasMaxLength(30)
                         .HasColumnType("TEXT");
 
                     b.Property<int?>("EntityId")
@@ -94,7 +95,6 @@ namespace AttendanceJournal.Data.Migrations
 
                     b.Property<string>("EntityType")
                         .IsRequired()
-                        .HasMaxLength(30)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("PayloadJson")
@@ -144,7 +144,10 @@ namespace AttendanceJournal.Data.Migrations
                     b.HasIndex("StudentGroupId", "Date", "PairNumber")
                         .IsUnique();
 
-                    b.ToTable("Lessons");
+                    b.ToTable("Lessons", t =>
+                        {
+                            t.HasCheckConstraint("CK_Lesson_PairNumber", "[PairNumber] >= 1 AND [PairNumber] <= 8");
+                        });
                 });
 
             modelBuilder.Entity("AttendanceJournal.Models.Setting", b =>
@@ -166,7 +169,7 @@ namespace AttendanceJournal.Data.Migrations
                         new
                         {
                             Key = "Language",
-                            Value = "uk-UA"
+                            Value = "Uk"
                         },
                         new
                         {

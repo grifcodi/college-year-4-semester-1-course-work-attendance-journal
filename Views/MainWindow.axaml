@@ -1,22 +1,63 @@
 ﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:AttendanceJournal.ViewModels"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        xmlns:loc="using:AttendanceJournal.ViewModels.Localization"
         x:Class="AttendanceJournal.Views.MainWindow"
         x:DataType="vm:MainViewModel"
-        Icon="/Assets/avalonia-logo.ico"
-        Title="AttendanceJournal">
+        Title="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_AppTitle]}"
+        Width="1120" Height="680"
+        MinWidth="860" MinHeight="520">
 
-    <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-        <vm:MainViewModel />
-    </Design.DataContext>
+    <Grid ColumnDefinitions="220,*">
+        <!-- ЛІВА НАВІГАЦІЙНА ПАНЕЛЬ -->
+        <Border Grid.Column="0"
+                Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                BorderThickness="0,0,1,0"
+                Padding="12,16">
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Top"
+                           Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_NavHeader]}"
+                           FontSize="20"
+                           FontWeight="Bold"
+                           Margin="8,0,0,20" />
 
-    <TextBox Text="{Binding Greeting}"
-             HorizontalAlignment="Center"
-             VerticalAlignment="Center" />
+                <StackPanel DockPanel.Dock="Top" Spacing="4">
+                    <Button Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_NavGroups]}"
+                            Command="{Binding NavigateToGroupsCommand}"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Left"
+                            Padding="10,8" />
+                </StackPanel>
+            </DockPanel>
+        </Border>
 
+        <!-- ОСНОВНА РОБОЧА ОБЛАСТЬ -->
+        <Grid Grid.Column="1" RowDefinitions="Auto,*">
+            <Border Grid.Row="0"
+                    Background="{DynamicResource ErrorBannerBackgroundBrush}"
+                    BorderBrush="{DynamicResource ErrorBannerBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="12,10"
+                    Margin="16,16,16,0"
+                    IsVisible="{Binding GroupsPage.StartupErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                <DockPanel>
+                    <Button DockPanel.Dock="Right"
+                            Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_RetryButton]}"
+                            Command="{Binding GroupsPage.RetryStartupCommand}"
+                            Margin="12,0,0,0" />
+                    <TextBlock Text="{Binding GroupsPage.StartupErrorMessage}"
+                               Foreground="{DynamicResource ErrorBannerTextBrush}"
+                               FontWeight="SemiBold"
+                               VerticalAlignment="Center"
+                               TextWrapping="Wrap" />
+                </DockPanel>
+            </Border>
+
+            <ContentControl Grid.Row="1"
+                            Content="{Binding CurrentPage}"
+                            IsEnabled="{Binding !GroupsPage.IsInitializing}" />
+        </Grid>
+    </Grid>
 </Window>

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -19,8 +20,8 @@ namespace AttendanceJournal.Data.Migrations
                     AuditEntryId = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     TimeStamp = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Action = table.Column<string>(type: "TEXT", maxLength: 30, nullable: false),
-                    EntityType = table.Column<string>(type: "TEXT", maxLength: 30, nullable: false),
+                    Action = table.Column<string>(type: "TEXT", nullable: false),
+                    EntityType = table.Column<string>(type: "TEXT", nullable: false),
                     EntityId = table.Column<int>(type: "INTEGER", nullable: true),
                     PayloadJson = table.Column<string>(type: "TEXT", nullable: false)
                 },
@@ -108,6 +109,7 @@ namespace AttendanceJournal.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Lessons", x => x.LessonId);
+                    table.CheckConstraint("CK_Lesson_PairNumber", "[PairNumber] >= 1 AND [PairNumber] <= 8");
                     table.ForeignKey(
                         name: "FK_Lessons_StudentGroups_StudentGroupId",
                         column: x => x.StudentGroupId,
@@ -156,7 +158,7 @@ namespace AttendanceJournal.Data.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     AttendanceRecordId = table.Column<int>(type: "INTEGER", nullable: false),
                     VersionNumber = table.Column<int>(type: "INTEGER", nullable: false),
-                    Status = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
+                    Status = table.Column<string>(type: "TEXT", nullable: false),
                     Note = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
                     Grade = table.Column<int>(type: "INTEGER", nullable: true),
                     Reason = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
@@ -165,6 +167,7 @@ namespace AttendanceJournal.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AttendanceVersions", x => x.AttendanceVersionId);
+                    table.CheckConstraint("CK_ATtendanceVersions_Grade", "[Grade] IS NULL OR ([Grade] >= 0 AND [Grade] <= 100)");
                     table.ForeignKey(
                         name: "FK_AttendanceVersions_AttendanceRecords_AttendanceRecordId",
                         column: x => x.AttendanceRecordId,
@@ -178,7 +181,7 @@ namespace AttendanceJournal.Data.Migrations
                 columns: new[] { "Key", "Value" },
                 values: new object[,]
                 {
-                    { "Language", "uk-UA" },
+                    { "Language", "Uk" },
                     { "Theme", "Light" }
                 });
 

@@ -8,6 +8,10 @@ internal class LessonConfiguration : IEntityTypeConfiguration<Lesson>
 {
     public void Configure(EntityTypeBuilder<Lesson> builder)
     {
+        builder.ToTable(t => t.HasCheckConstraint(
+            "CK_Lesson_PairNumber",
+            "[PairNumber] >= 1 AND [PairNumber] <= 8"));
+
         builder.Property(l => l.Topic)
             .HasMaxLength(ValidationConstants.LessonTopicMaxLength);
 
