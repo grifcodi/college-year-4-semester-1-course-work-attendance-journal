@@ -1,9 +1,6 @@
 ﻿using AttendanceJournal.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace AttendanceJournal.Data.Configurations;
 
@@ -23,7 +20,7 @@ internal class SettingConfiguration : IEntityTypeConfiguration<Setting>
 
         builder.HasData(
             new Setting { Key = "Language", Value = "uk-UA" },
-            new Setting { Key = "Theme", Value = "Light" }    
+            new Setting { Key = "Theme", Value = "Light" }
         );
     }
 }

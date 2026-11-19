@@ -2,8 +2,9 @@
 
 public static class ErrorKeys
 {
-    public const string DatabaseConflict = "Err_DatabaseConflict";
-    public const string EntityNotFound = "Err_EntityNotFound";
+    public const string DatabaseUnavailable = "Err_Database_Unavailable";
+    public const string DatabaseConflict = "Err_Database_Conflict";
+    public const string EntityNotFound = "Err_Entity_NotFound";
 
     public const string SubjectNameRequired = "Err_Subject_NameRequired";
     public const string SubjectNameTooLong = "Err_Subject_NameTooLong";
@@ -19,4 +20,6 @@ public static class ErrorKeys
     public const string StudentNameRequired = "Err_Student_NameRequired";
     public const string StudentNameTooLong = "Err_Student_NameTooLong";
     public const string StudentAlreadyExists = "Err_Student_AlreadyExists";
+
+    public const string UnexpectedError = "Err_Unexpected";
 }

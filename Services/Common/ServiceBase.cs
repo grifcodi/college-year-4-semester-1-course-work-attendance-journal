@@ -1,8 +1,6 @@
 ﻿using AttendanceJournal.Data;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Threading.Tasks;
 
 namespace AttendanceJournal.Services.Common;
 

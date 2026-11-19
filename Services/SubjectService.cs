@@ -133,7 +133,7 @@ public class SubjectService(IDbContextFactory<AppDbContext> dbContextFactory)
             return Result<(string, string)>.Failure(ErrorKeys.SubjectNameTooLong, ValidationConstants.SubjectNameMaxLength);
 
         return Result<(string, string)>.Success((
-            trimmed, 
+            trimmed,
             NameNormalizer.Normalize(trimmed)));
     }
 }

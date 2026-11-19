@@ -84,10 +84,10 @@ public class T09_AuditTests : SqliteInMemoryTestBase
         await subjects.CreateAsync("Фізика");
         var before = (await ContextFactory.GetAuditAsync()).Count;
 
-        await subjects.CreateAsync("ФІЗИКА");   
-        await subjects.CreateAsync("   ");         
-        await subjects.UpdateAsync(999, "Хімія"); 
-        await subjects.ArchiveAsync(999);          
+        await subjects.CreateAsync("ФІЗИКА");
+        await subjects.CreateAsync("   ");
+        await subjects.UpdateAsync(999, "Хімія");
+        await subjects.ArchiveAsync(999);
 
         Assert.Equal(before, (await ContextFactory.GetAuditAsync()).Count);
     }
@@ -101,8 +101,8 @@ public class T09_AuditTests : SqliteInMemoryTestBase
         await subjects.ArchiveAsync(id);
         var before = (await ContextFactory.GetAuditAsync()).Count;
 
-        await subjects.UpdateAsync(id, "Фізика");  
-        await subjects.ArchiveAsync(id);          
+        await subjects.UpdateAsync(id, "Фізика");
+        await subjects.ArchiveAsync(id);
 
         Assert.Equal(before, (await ContextFactory.GetAuditAsync()).Count);
     }

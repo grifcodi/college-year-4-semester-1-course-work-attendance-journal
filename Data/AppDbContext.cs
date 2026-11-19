@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using AttendanceJournal.Models;
+﻿using AttendanceJournal.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace AttendanceJournal.Data;
