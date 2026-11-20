@@ -33,6 +33,7 @@ public static class ErrorKeys
     public const string AttendanceStudentArchived = "Err_Attendance_StudentArchived";
     public const string AttendanceStudentWrongGroup = "Err_Attendance_StudentWrongGroup";
     public const string AttendanceVersionNotFound = "Err_Attendance_VersionNotFound";
+    public const string AttendanceNoChange = "Err_Attendance_NoChange";
 
     public const string UnexpectedError = "Err_Unexpected";
 }

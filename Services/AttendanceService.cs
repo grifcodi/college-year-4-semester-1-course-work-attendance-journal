@@ -20,21 +20,22 @@ public class AttendanceService(IDbContextFactory<AppDbContext> dbContextFactory)
         if (lesson is null)
             return [];
 
-        var activeStudents = await context.Students
+        var latestMarks = await GetLatestForLessonsInternalAsync(context, [lessonId]);
+        var marksByStudent = latestMarks.ToDictionary(m => m.StudentId);
+        var markedIds = marksByStudent.Keys.ToList();
+
+        var sheetStudents = await context.Students
             .AsNoTracking()
-            .Where(s => s.StudentGroupId == lesson.StudentGroupId && !s.IsArchived)
+            .Where(s => s.StudentGroupId == lesson.StudentGroupId
+                        && (!s.IsArchived || markedIds.Contains(s.StudentId)))
             .OrderBy(s => s.FullName)
             .ToListAsync();
 
-        var latestMarks = await GetLatestForLessonsInternalAsync(context, [lessonId]);
-        var marksByStudent = latestMarks.ToDictionary(m => m.StudentId);
-
-        return activeStudents
+        return [.. sheetStudents
             .Select(s => new LessonStudentRowDto(
                 s.StudentId,
                 s.FullName,
-                marksByStudent.GetValueOrDefault(s.StudentId)))
-            .ToList();
+                marksByStudent.GetValueOrDefault(s.StudentId)))];
     }
 
     public async Task<List<AttendanceCellDto>> GetLatestForLessonsAsync(IEnumerable<int> lessonIds)
@@ -113,6 +114,10 @@ public class AttendanceService(IDbContextFactory<AppDbContext> dbContextFactory)
 
             if (currentMaxVersion > 0)
             {
+                var current = record.Versions.First(v => v.VersionNumber == currentMaxVersion);
+                if (current.Status == status && current.Grade == grade && current.Note == normalizedNote)
+                    return Result<AttendanceCellDto>.Failure(ErrorKeys.AttendanceNoChange);
+
                 if (string.IsNullOrEmpty(normalizedReason))
                     return Result<AttendanceCellDto>.Failure(ErrorKeys.AttendanceReasonRequired);
 
@@ -122,6 +127,7 @@ public class AttendanceService(IDbContextFactory<AppDbContext> dbContextFactory)
                         ValidationConstants.ReasonMinLength);
             }
 
+            var storedReason = currentMaxVersion == 0 ? null : normalizedReason;
             var nextVersionNumber = currentMaxVersion + 1;
             var newVersion = new AttendanceVersion
             {
@@ -130,7 +136,7 @@ public class AttendanceService(IDbContextFactory<AppDbContext> dbContextFactory)
                 Status = status,
                 Grade = grade,
                 Note = normalizedNote,
-                Reason = normalizedReason,
+                Reason = storedReason,
                 TimeStamp = DateTime.UtcNow
             };
 
@@ -147,7 +153,8 @@ public class AttendanceService(IDbContextFactory<AppDbContext> dbContextFactory)
                     Version = nextVersionNumber,
                     Status = status.ToString(),
                     Grade = grade,
-                    Reason = normalizedReason
+                    Note = normalizedNote,
+                    Reason = storedReason
                 }));
 
             await context.SaveChangesAsync();
@@ -279,7 +286,13 @@ public class AttendanceService(IDbContextFactory<AppDbContext> dbContextFactory)
             if (targetVersion is null)
                 return Result<AttendanceCellDto>.Failure(ErrorKeys.AttendanceVersionNotFound);
 
-            var nextVersionNumber = record.Versions.Max(v => v.VersionNumber) + 1;
+            var latest = record.Versions.OrderByDescending(v => v.VersionNumber).First();
+            if (latest.Status == targetVersion.Status
+                && latest.Grade == targetVersion.Grade
+                && latest.Note == targetVersion.Note)
+                return Result<AttendanceCellDto>.Failure(ErrorKeys.AttendanceNoChange);
+
+            var nextVersionNumber = latest.VersionNumber + 1;
             var restoredVersion = new AttendanceVersion
             {
                 AttendanceRecordId = record.AttendanceRecordId,
@@ -305,6 +318,7 @@ public class AttendanceService(IDbContextFactory<AppDbContext> dbContextFactory)
                     NewVersion = nextVersionNumber,
                     Status = restoredVersion.Status.ToString(),
                     restoredVersion.Grade,
+                    restoredVersion.Note,
                     Reason = normalizedReason
                 }));
 

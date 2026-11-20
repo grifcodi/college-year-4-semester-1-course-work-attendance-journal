@@ -1,4 +1,5 @@
-﻿using AttendanceJournal.Services;
+﻿using AttendanceJournal.Models;
+using AttendanceJournal.Services;
 using AttendanceJournal.Services.Common;
 using AttendanceJournal.Tests.TestHelpers;
 using AttendanceJournal.ViewModels;

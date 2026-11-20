@@ -80,6 +80,7 @@ public static class Localizer
         [ErrorKeys.AttendanceStudentArchived] = "Студент перебуває в архіві та не може бути відмічений на новому занятті.",
         [ErrorKeys.AttendanceStudentWrongGroup] = "Студент не належить до групи цього заняття.",
         [ErrorKeys.AttendanceVersionNotFound] = "Вказану версію запису відвідуваності не знайдено.",
+        [ErrorKeys.AttendanceNoChange] = "Нічого не змінено. Змініть статус, оцінку або примітку.",
     };
 
     private static readonly Dictionary<string, string> EnStrings = new()
@@ -142,6 +143,7 @@ public static class Localizer
         [ErrorKeys.AttendanceStudentArchived] = "The student is archived and cannot be marked in new lessons.",
         [ErrorKeys.AttendanceStudentWrongGroup] = "The student does not belong to this lesson's group.",
         [ErrorKeys.AttendanceVersionNotFound] = "The specified attendance record version was not found.",
+        [ErrorKeys.AttendanceNoChange] = "Nothing was changed. Change the status, grade or note.",
     };
 
     public static string TranslateError(Result result, AppLanguage? language = null)

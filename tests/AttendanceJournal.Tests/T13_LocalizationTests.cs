@@ -1,4 +1,5 @@
-﻿using AttendanceJournal.Services.Common;
+﻿using AttendanceJournal.Models;
+using AttendanceJournal.Services.Common;
 using AttendanceJournal.ViewModels.Localization;
 using System.Reflection;
 
@@ -6,48 +7,58 @@ namespace AttendanceJournal.Tests;
 
 public class T13_LocalizationTests
 {
-    public static IEnumerable<object[]> AllKeysAndLanguages()
-    {
-        var keys = new[] { typeof(ErrorKeys), typeof(UiTextKeys) }
+    private static List<string> AllKeys() =>
+        new[] { typeof(ErrorKeys), typeof(UiTextKeys) }
             .SelectMany(t => t.GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy))
             .Where(f => f.IsLiteral && f.FieldType == typeof(string))
-            .Select(f => (string)f.GetRawConstantValue()!);
+            .Select(f => (string)f.GetRawConstantValue()!)
+            .ToList();
 
-        foreach (var key in keys)
-            foreach (var language in Enum.GetValues<AppLanguage>())
-                yield return [key, language];
+    [Fact]
+    public void KeyDiscovery_FindsKeys_AndKeyValuesAreUnique()
+    {
+        var keys = AllKeys();
+
+        Assert.NotEmpty(keys);
+        var duplicates = keys.GroupBy(k => k).Where(g => g.Count() > 1).Select(g => g.Key).ToList();
+        Assert.True(duplicates.Count == 0, "Однакові значення ключів: " + string.Join(", ", duplicates));
     }
 
-    public static TheoryData<string, AppLanguage> KeyTheoryData()
+    [Fact]
+    public void EveryKey_HasTranslation_InEveryLanguage()
     {
-        var data = new TheoryData<string, AppLanguage>();
-        foreach (var row in AllKeysAndLanguages())
-            data.Add((string)row[0], (AppLanguage)row[1]);
-        return data;
+        var missing = new List<string>();
+
+        foreach (var language in Enum.GetValues<AppLanguage>())
+        {
+            foreach (var key in AllKeys())
+            {
+                var text = Localizer.TranslateError(Result.Failure(key, 100), language);
+                if (string.IsNullOrWhiteSpace(text) || text == key)
+                    missing.Add($"{language}: {key}");
+            }
+        }
+
+        Assert.True(missing.Count == 0,
+            "Немає перекладу для:" + Environment.NewLine + string.Join(Environment.NewLine, missing));
     }
 
-    [Theory]
-    [MemberData(nameof(KeyTheoryData))]
-    public void EveryErrorKey_HasTranslation_InEveryLanguage(string key, AppLanguage language)
+    [Fact]
+    public void Messages_AreDistinct_InEveryLanguage()
     {
-        var text = Localizer.TranslateError(Result.Failure(key, 100), language);
+        var duplicates = new List<string>();
 
-        Assert.False(string.IsNullOrWhiteSpace(text));
-        Assert.NotEqual(key, text);
-    }
+        foreach (var language in Enum.GetValues<AppLanguage>())
+        {
+            var sameText = AllKeys()
+                .GroupBy(k => Localizer.TranslateError(Result.Failure(k, "x"), language))
+                .Where(g => g.Count() > 1);
 
-    [Theory]
-    [InlineData(AppLanguage.Uk)]
-    [InlineData(AppLanguage.En)]
-    public void Messages_AreDistinctPerKey(AppLanguage language)
-    {
-        var keys = AllKeysAndLanguages()
-            .Where(r => (AppLanguage)r[1] == language)
-            .Select(r => (string)r[0]);
+            duplicates.AddRange(sameText.Select(g => $"{language}: {string.Join(", ", g)}"));
+        }
 
-        var texts = keys.Select(k => Localizer.TranslateError(Result.Failure(k, "x"), language)).ToList();
-
-        Assert.Equal(texts.Count, texts.Distinct().Count());
+        Assert.True(duplicates.Count == 0,
+            "Однаковий текст для різних ключів:" + Environment.NewLine + string.Join(Environment.NewLine, duplicates));
     }
 
     [Fact]

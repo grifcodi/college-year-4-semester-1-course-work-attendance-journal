@@ -11,6 +11,9 @@ public class LessonService(IDbContextFactory<AppDbContext> dbContextFactory)
 {
     public async Task<List<Lesson>> GetByMonthAsync(int groupId, int subjectId, int year, int month)
     {
+        if (month is < 1 or > 12 || year is < 1 or > 9998)
+            return [];
+
         var startDate = new DateOnly(year, month, 1);
         var endDate = startDate.AddMonths(1).AddDays(-1);
 
@@ -112,6 +115,9 @@ public class LessonService(IDbContextFactory<AppDbContext> dbContextFactory)
                 return Result<Lesson>.Failure(ErrorKeys.EntityNotFound);
 
             var oldTopic = lesson.Topic;
+            if (oldTopic == normalizedTopic)
+                return Result<Lesson>.Success(lesson);
+
             lesson.Topic = normalizedTopic;
 
             context.AuditEntries.Add(AuditHelper.CreateEntry(
