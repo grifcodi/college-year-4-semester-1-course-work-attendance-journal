@@ -13,6 +13,7 @@ public static class UiTextKeys
     public const string AppTitle = "Ui_AppTitle";
     public const string NavHeader = "Ui_NavHeader";
     public const string NavGroups = "Ui_NavGroups";
+    public const string NavSettings = "Ui_NavSettings";
     public const string RetryButton = "Ui_RetryButton";
 
     // Екран «Групи та студенти»
@@ -30,4 +31,15 @@ public static class UiTextKeys
     public const string ShowArchivedStudentsFilter = "Ui_ShowArchivedStudentsFilter";
     public const string StudentFullNamePlaceholder = "Ui_StudentFullNamePlaceholder";
     public const string SaveStudentButton = "Ui_SaveStudentButton";
+
+    // Екран «Налаштування» (FR-13)
+    public const string SettingsHeader = "Ui_SettingsHeader";
+    public const string SettingsLanguageLabel = "Ui_SettingsLanguageLabel";
+    public const string SettingsLanguageDescription = "Ui_SettingsLanguageDescription";
+    public const string SettingsLanguageUk = "Ui_SettingsLanguageUk";
+    public const string SettingsLanguageEn = "Ui_SettingsLanguageEn";
+    public const string SettingsThemeLabel = "Ui_SettingsThemeLabel";
+    public const string SettingsThemeDescription = "Ui_SettingsThemeDescription";
+    public const string SettingsThemeLight = "Ui_SettingsThemeLight";
+    public const string SettingsThemeDark = "Ui_SettingsThemeDark";
 }

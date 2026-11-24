@@ -1,4 +1,4 @@
 <Solution>
   <Project Path="AttendanceJournal.csproj" />
-  <Project Path="Tests/AttendanceJournal.Tests/AttendanceJournal.Tests.csproj" />
+  <Project Path="tests/AttendanceJournal.Tests/AttendanceJournal.Tests.csproj" />
 </Solution>

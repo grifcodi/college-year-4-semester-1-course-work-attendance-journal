@@ -37,10 +37,17 @@
                         Padding="10,6"
                         Margin="0,0,0,8"
                         IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-                    <TextBlock Text="{Binding ErrorMessage}"
-                               Foreground="{DynamicResource ErrorBannerTextBrush}"
-                               FontSize="12"
-                               TextWrapping="Wrap" />
+                    <DockPanel>
+                        <Button DockPanel.Dock="Right"
+                                Margin="8,0,0,0"
+                                Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_RetryButton]}"
+                                Command="{Binding RetryLastOperationCommand}"
+                                IsVisible="{Binding CanRetry}" />
+                        <TextBlock Text="{Binding ErrorMessage}"
+                                   Foreground="{DynamicResource ErrorBannerTextBrush}"
+                                   FontSize="12"
+                                   TextWrapping="Wrap" />
+                    </DockPanel>
                 </Border>
 
                 <!-- Форма створення / редагування -->
@@ -129,10 +136,17 @@
                         Padding="10,6"
                         Margin="0,0,0,8"
                         IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-                    <TextBlock Text="{Binding ErrorMessage}"
-                               Foreground="{DynamicResource ErrorBannerTextBrush}"
-                               FontSize="12"
-                               TextWrapping="Wrap" />
+                    <DockPanel>
+                        <Button DockPanel.Dock="Right"
+                                Margin="8,0,0,0"
+                                Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_RetryButton]}"
+                                Command="{Binding RetryLastOperationCommand}"
+                                IsVisible="{Binding CanRetry}" />
+                        <TextBlock Text="{Binding ErrorMessage}"
+                                   Foreground="{DynamicResource ErrorBannerTextBrush}"
+                                   FontSize="12"
+                                   TextWrapping="Wrap" />
+                    </DockPanel>
                 </Border>
 
                 <!-- Форма додавання / редагування -->

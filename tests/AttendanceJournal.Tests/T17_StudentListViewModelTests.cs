@@ -1,4 +1,4 @@
-﻿using AttendanceJournal.Models;
+using AttendanceJournal.Models;
 using AttendanceJournal.Services;
 using AttendanceJournal.Services.Common;
 using AttendanceJournal.Tests.TestHelpers;
@@ -7,6 +7,7 @@ using AttendanceJournal.ViewModels.Localization;
 
 namespace AttendanceJournal.Tests;
 
+[Collection(AttendanceJournal.Tests.TestHelpers.LocalizerCollection.Name)]
 public class T17_StudentListViewModelTests : SqliteInMemoryTestBase
 {
     private readonly FakeConfirmationService _confirm = new();
@@ -188,3 +189,5 @@ public class T17_StudentListViewModelTests : SqliteInMemoryTestBase
         Assert.Equal("StudentList.Load", Assert.Single(_log.Entries).Context);
     }
 }
+
+

@@ -1,5 +1,6 @@
-﻿using AttendanceJournal.Models;
+using AttendanceJournal.Models;
 using AttendanceJournal.Services.Interfaces;
+using AttendanceJournal.ViewModels.Interfaces;
 using AttendanceJournal.ViewModels.Localization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -37,7 +38,7 @@ public partial class StudentListViewModel(
     public Task LoadForGroupAsync(int? groupId)
     {
         CurrentGroupId = groupId;
-        ErrorMessage = null;
+        ClearError();
         CancelEdit();
         return RefreshAsync();
     }
@@ -60,7 +61,7 @@ public partial class StudentListViewModel(
         Students.Clear();
         foreach (var item in items)
             Students.Add(item);
-    });
+    }, allowRetry: true);
 
     [RelayCommand]
     private Task SaveAsync() => RunSafeAsync("StudentList.Save", async () =>
@@ -68,7 +69,7 @@ public partial class StudentListViewModel(
         if (CurrentGroupId is not int groupId)
             return;
 
-        ErrorMessage = null;
+        ClearError();
 
         var result = _editingStudentId is int studentId
             ? await studentService.UpdateAsync(studentId, FullNameInput)
@@ -82,7 +83,7 @@ public partial class StudentListViewModel(
 
         CancelEdit();
         await RefreshAsync();
-    });
+    }, allowRetry: true);
 
     [RelayCommand]
     private void StartEdit(Student? student)
@@ -109,7 +110,7 @@ public partial class StudentListViewModel(
         if (student is null)
             return;
 
-        ErrorMessage = null;
+        ClearError();
 
         if (!student.IsArchived)
         {
@@ -129,5 +130,7 @@ public partial class StudentListViewModel(
         }
 
         await RefreshAsync();
-    });
+    }, allowRetry: true);
 }
+
+

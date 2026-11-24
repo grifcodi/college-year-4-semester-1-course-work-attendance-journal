@@ -1,0 +1,87 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AttendanceJournal.ViewModels"
+             xmlns:loc="using:AttendanceJournal.ViewModels.Localization"
+             x:Class="AttendanceJournal.Views.SettingsPageView"
+             x:DataType="vm:SettingsPageViewModel">
+
+    <ScrollViewer Margin="16">
+        <StackPanel MaxWidth="640" HorizontalAlignment="Left" Spacing="16">
+            <TextBlock Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_SettingsHeader]}"
+                       FontSize="22"
+                       FontWeight="Bold" />
+
+            <!-- Банер помилки збереження -->
+            <Border Background="{DynamicResource ErrorBannerBackgroundBrush}"
+                    BorderBrush="{DynamicResource ErrorBannerBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="10,8"
+                    IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                <DockPanel>
+                    <Button DockPanel.Dock="Right"
+                            Margin="8,0,0,0"
+                            Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_RetryButton]}"
+                            Command="{Binding RetryLastOperationCommand}"
+                            IsVisible="{Binding CanRetry}" />
+                    <TextBlock Text="{Binding ErrorMessage}"
+                               Foreground="{DynamicResource ErrorBannerTextBrush}"
+                               FontSize="12"
+                               TextWrapping="Wrap" />
+                </DockPanel>
+            </Border>
+
+            <!-- Картка мови інтерфейсу -->
+            <Border Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="16">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_SettingsLanguageLabel]}"
+                               FontSize="16"
+                               FontWeight="SemiBold" />
+                    <TextBlock Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_SettingsLanguageDescription]}"
+                               FontSize="12"
+                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                               TextWrapping="Wrap" />
+
+                    <StackPanel Orientation="Horizontal" Spacing="16" Margin="0,4,0,0">
+                        <RadioButton GroupName="LanguageGroup"
+                                     Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_SettingsLanguageUk]}"
+                                     IsChecked="{Binding IsUkrainianSelected}" />
+                        <RadioButton GroupName="LanguageGroup"
+                                     Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_SettingsLanguageEn]}"
+                                     IsChecked="{Binding IsEnglishSelected}" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Картка теми оформлення -->
+            <Border Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="16">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_SettingsThemeLabel]}"
+                               FontSize="16"
+                               FontWeight="SemiBold" />
+                    <TextBlock Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_SettingsThemeDescription]}"
+                               FontSize="12"
+                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                               TextWrapping="Wrap" />
+
+                    <StackPanel Orientation="Horizontal" Spacing="16" Margin="0,4,0,0">
+                        <RadioButton GroupName="ThemeGroup"
+                                     Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_SettingsThemeLight]}"
+                                     IsChecked="{Binding IsLightThemeSelected}" />
+                        <RadioButton GroupName="ThemeGroup"
+                                     Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_SettingsThemeDark]}"
+                                     IsChecked="{Binding IsDarkThemeSelected}" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

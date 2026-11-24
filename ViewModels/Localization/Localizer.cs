@@ -26,6 +26,8 @@ public static class Localizer
         [ErrorKeys.DatabaseUnavailable] = "Не вдалося відкрити базу даних. Перевірте права доступу до папки профілю та спробуйте ще раз.",
         [ErrorKeys.UnexpectedError] = "Сталася неочікувана помилка. Спробуйте ще раз; подробиці записано в журнал помилок.",
         [ErrorKeys.EntityNotFound] = "Запис не знайдено. Можливо, його вже змінено. Оновіть список і спробуйте ще раз.",
+        [ErrorKeys.DatabaseBusy] = "База даних тимчасово заблокована іншою операцією. Зачекайте мить і спробуйте ще раз.",
+        [ErrorKeys.StudentGroupArchived] = "Неможливо додати студента до архівної групи. Спершу відновіть групу з архіву.",
 
         [ErrorKeys.SubjectNameRequired] = "Введіть назву дисципліни.",
         [ErrorKeys.SubjectNameTooLong] = "Назва дисципліни занадто довга. Максимум — {0} символів, скоротіть її.",
@@ -81,6 +83,17 @@ public static class Localizer
         [ErrorKeys.AttendanceStudentWrongGroup] = "Студент не належить до групи цього заняття.",
         [ErrorKeys.AttendanceVersionNotFound] = "Вказану версію запису відвідуваності не знайдено.",
         [ErrorKeys.AttendanceNoChange] = "Нічого не змінено. Змініть статус, оцінку або примітку.",
+
+        [UiTextKeys.NavSettings] = "Налаштування",
+        [UiTextKeys.SettingsHeader] = "Налаштування інтерфейсу",
+        [UiTextKeys.SettingsLanguageLabel] = "Мова інтерфейсу",
+        [UiTextKeys.SettingsLanguageDescription] = "Змінює мову меню, повідомлень про помилки та підписів без перезапуску.",
+        [UiTextKeys.SettingsLanguageUk] = "Українська",
+        [UiTextKeys.SettingsLanguageEn] = "English",
+        [UiTextKeys.SettingsThemeLabel] = "Тема оформлення",
+        [UiTextKeys.SettingsThemeDescription] = "Перемикає світлу та темну кольорову схему вікна.",
+        [UiTextKeys.SettingsThemeLight] = "Світла",
+        [UiTextKeys.SettingsThemeDark] = "Темна",
     };
 
     private static readonly Dictionary<string, string> EnStrings = new()
@@ -89,6 +102,8 @@ public static class Localizer
         [ErrorKeys.DatabaseUnavailable] = "The database could not be opened. Check access rights to your profile folder and try again.",
         [ErrorKeys.UnexpectedError] = "An unexpected error occurred. Try again; the details were written to the error log.",
         [ErrorKeys.EntityNotFound] = "The record was not found. It may have been changed already. Refresh the list and try again.",
+        [ErrorKeys.DatabaseBusy] = "The database is temporarily busy or locked. Wait a moment and try again.",
+        [ErrorKeys.StudentGroupArchived] = "Cannot add a student to an archived group. Restore the group from the archive first.",
 
         [ErrorKeys.SubjectNameRequired] = "Enter the subject name.",
         [ErrorKeys.SubjectNameTooLong] = "The subject name is too long. The maximum is {0} characters; shorten it.",
@@ -144,6 +159,17 @@ public static class Localizer
         [ErrorKeys.AttendanceStudentWrongGroup] = "The student does not belong to this lesson's group.",
         [ErrorKeys.AttendanceVersionNotFound] = "The specified attendance record version was not found.",
         [ErrorKeys.AttendanceNoChange] = "Nothing was changed. Change the status, grade or note.",
+
+        [UiTextKeys.NavSettings] = "Settings",
+        [UiTextKeys.SettingsHeader] = "Interface Settings",
+        [UiTextKeys.SettingsLanguageLabel] = "Interface Language",
+        [UiTextKeys.SettingsLanguageDescription] = "Changes the language of menus, error messages, and labels without restarting.",
+        [UiTextKeys.SettingsLanguageUk] = "Ukrainian (Українська)",
+        [UiTextKeys.SettingsLanguageEn] = "English",
+        [UiTextKeys.SettingsThemeLabel] = "Color Theme",
+        [UiTextKeys.SettingsThemeDescription] = "Switches between light and dark window appearance.",
+        [UiTextKeys.SettingsThemeLight] = "Light",
+        [UiTextKeys.SettingsThemeDark] = "Dark",
     };
 
     public static string TranslateError(Result result, AppLanguage? language = null)

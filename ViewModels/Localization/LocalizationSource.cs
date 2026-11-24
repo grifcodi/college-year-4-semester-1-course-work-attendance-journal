@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using AttendanceJournal.Models;
 using AttendanceJournal.Services.Common;
 
@@ -12,6 +12,11 @@ public sealed class LocalizationSource : INotifyPropertyChanged
 
     public string this[string key] => Localizer.Translate(key);
 
-    public void NotifyLanguageChanged() =>
+    public void NotifyLanguageChanged()
+    {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Item[]"));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(string.Empty));
+    }
 }
+
+

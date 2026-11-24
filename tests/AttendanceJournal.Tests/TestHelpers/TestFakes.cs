@@ -1,6 +1,6 @@
 ﻿using AttendanceJournal.Data;
 using AttendanceJournal.Services.Interfaces;
-using AttendanceJournal.ViewModels;
+using AttendanceJournal.ViewModels.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace AttendanceJournal.Tests.TestHelpers;

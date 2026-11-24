@@ -1,4 +1,4 @@
-﻿using AttendanceJournal.Data;
+using AttendanceJournal.Data;
 using AttendanceJournal.Models;
 using AttendanceJournal.Services.Common;
 using AttendanceJournal.Services.Interfaces;
@@ -16,10 +16,11 @@ public class StudentGroupService(IDbContextFactory<AppDbContext> dbContextFactor
         if (!includeArchived)
             query = query.Where(g => !g.IsArchived);
 
-        return await query
-            .OrderByDescending(g => g.AcademicYear)
-            .ThenBy(g => g.Name)
-            .ToListAsync();
+        var groups = await query.ToListAsync();
+        return groups
+            .OrderByDescending(g => g.AcademicYear, StringComparer.Ordinal)
+            .ThenBy(g => g.Name, NameSorting.Comparer)
+            .ToList();
     }
 
     public async Task<Result<StudentGroup>> CreateAsync(string name, string academicYear)
@@ -155,3 +156,6 @@ public class StudentGroupService(IDbContextFactory<AppDbContext> dbContextFactor
             trimmedYear));
     }
 }
+
+
+

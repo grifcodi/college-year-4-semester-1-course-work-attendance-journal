@@ -4,7 +4,7 @@
         xmlns:loc="using:AttendanceJournal.ViewModels.Localization"
         x:Class="AttendanceJournal.Views.MainWindow"
         x:DataType="vm:MainViewModel"
-        Title="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_AppTitle]}"
+        Title="{Binding AppTitleText}"
         Width="1120" Height="680"
         MinWidth="860" MinHeight="520">
 
@@ -17,13 +17,20 @@
                 Padding="12,16">
             <DockPanel>
                 <TextBlock DockPanel.Dock="Top"
-                           Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_NavHeader]}"
+                           Text="{Binding NavHeaderText}"
                            FontSize="20"
                            FontWeight="Bold"
                            Margin="8,0,0,20" />
 
+                <Button DockPanel.Dock="Bottom"
+                        Content="{Binding NavSettingsText}"
+                        Command="{Binding NavigateToSettingsCommand}"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Left"
+                        Padding="10,8" />
+
                 <StackPanel DockPanel.Dock="Top" Spacing="4">
-                    <Button Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_NavGroups]}"
+                    <Button Content="{Binding NavGroupsText}"
                             Command="{Binding NavigateToGroupsCommand}"
                             HorizontalAlignment="Stretch"
                             HorizontalContentAlignment="Left"
@@ -44,7 +51,7 @@
                     IsVisible="{Binding GroupsPage.StartupErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
                 <DockPanel>
                     <Button DockPanel.Dock="Right"
-                            Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_RetryButton]}"
+                            Content="{Binding RetryText}"
                             Command="{Binding GroupsPage.RetryStartupCommand}"
                             Margin="12,0,0,0" />
                     <TextBlock Text="{Binding GroupsPage.StartupErrorMessage}"

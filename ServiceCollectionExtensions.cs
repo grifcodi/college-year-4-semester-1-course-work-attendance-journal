@@ -3,6 +3,7 @@ using AttendanceJournal.Services;
 using AttendanceJournal.Services.Common;
 using AttendanceJournal.Services.Interfaces;
 using AttendanceJournal.ViewModels;
+using AttendanceJournal.ViewModels.Interfaces;
 using AttendanceJournal.Views;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,9 +25,12 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ILessonService, LessonService>();
         services.AddSingleton<IAttendanceService, AttendanceService>();
         services.AddSingleton<IErrorLog, FileErrorLog>();
-
+        services.AddSingleton<ISummaryService, SummaryService>();
+        services.AddSingleton<ISettingService, SettingService>();
+        services.AddSingleton<IThemeApplier, AvaloniaThemeApplier>();
         services.AddSingleton<IConfirmationService, DialogConfirmationService>();
 
+        services.AddTransient<SettingsPageViewModel>();
         services.AddTransient<GroupListViewModel>();
         services.AddTransient<StudentListViewModel>();
         services.AddTransient<GroupsPageViewModel>();

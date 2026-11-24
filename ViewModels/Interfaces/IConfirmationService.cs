@@ -1,4 +1,4 @@
-﻿namespace AttendanceJournal.ViewModels;
+﻿namespace AttendanceJournal.ViewModels.Interfaces;
 
 public interface IConfirmationService
 {

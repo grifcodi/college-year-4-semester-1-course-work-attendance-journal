@@ -8,7 +8,7 @@ public static class CrashLogger
     private const string ProfilePlaceholder = "%USERPROFILE%";
     private const int WriteAttempts = 3;
 
-    private static readonly object WriteLock = new();
+    private static readonly Lock WriteLock = new();
 
     public static string DefaultDirectory => Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -37,12 +37,13 @@ public static class CrashLogger
             var dir = directory ?? DefaultDirectory;
             var profile = userProfilePath ?? Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
+            var sanitizedDetails = SanitizeSensitiveData(exception.ToString(), profile);
+
             var text = new StringBuilder()
                 .Append('[').Append(DateTime.UtcNow.ToString("O")).Append("] ").AppendLine(context)
-                .AppendLine(exception.ToString())
+                .AppendLine(sanitizedDetails)
                 .AppendLine("----")
                 .ToString();
-            text = RemoveProfilePath(text, profile);
 
             lock (WriteLock)
             {
@@ -61,6 +62,20 @@ public static class CrashLogger
         {
             return ex;
         }
+    }
+
+    private static string SanitizeSensitiveData(string text, string profile)
+    {
+        var result = RemoveProfilePath(text, profile);
+
+        // Маскування значень параметрів SQLite/EF Core у винятках (наприклад, @p0='Шевченко Тарас')
+        result = System.Text.RegularExpressions.Regex.Replace(
+            result,
+            @"(@p\d+|FullName|Name)\s*=\s*'[^']*'",
+            "$1='[REDACTED]'",
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+        return result;
     }
 
     private static void AppendWithRetry(string path, string text)

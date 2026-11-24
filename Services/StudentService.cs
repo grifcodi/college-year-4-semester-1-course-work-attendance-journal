@@ -1,4 +1,4 @@
-﻿using AttendanceJournal.Data;
+using AttendanceJournal.Data;
 using AttendanceJournal.Models;
 using AttendanceJournal.Services.Common;
 using AttendanceJournal.Services.Interfaces;
@@ -19,7 +19,8 @@ public class StudentService(IDbContextFactory<AppDbContext> dbContextFactory)
         if (!includeArchived)
             query = query.Where(s => !s.IsArchived);
 
-        return await query.OrderBy(s => s.FullName).ToListAsync();
+        var students = await query.ToListAsync();
+        return [.. students.OrderByName(s => s.FullName)];
     }
 
     public async Task<Result<Student>> AddAsync(int groupId, string fullName)
@@ -29,12 +30,17 @@ public class StudentService(IDbContextFactory<AppDbContext> dbContextFactory)
             return Result<Student>.Failure(validation.ErrorKey!, validation.ErrorArgs);
 
         var trimmed = validation.Value!;
-
         return await ExecuteInTransactionAsync(async context =>
         {
-            var groupExists = await context.StudentGroups.AnyAsync(g => g.StudentGroupId == groupId);
-            if (!groupExists)
+            var group = await context.StudentGroups
+                .AsNoTracking()
+                .FirstOrDefaultAsync(g => g.StudentGroupId == groupId);
+
+            if (group is null)
                 return Result<Student>.Failure(ErrorKeys.EntityNotFound);
+
+            if (group.IsArchived)
+                return Result<Student>.Failure(ErrorKeys.StudentGroupArchived);
 
             var existingNames = await context.Students
                 .Where(s => s.StudentGroupId == groupId)
@@ -142,3 +148,6 @@ public class StudentService(IDbContextFactory<AppDbContext> dbContextFactory)
         return Result<string>.Success(trimmed);
     }
 }
+
+
+

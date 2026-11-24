@@ -1,5 +1,4 @@
 ﻿using AttendanceJournal.Data;
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
 namespace AttendanceJournal.Services.Common;
@@ -45,20 +44,20 @@ public abstract class ServiceBase(IDbContextFactory<AppDbContext> dbContextFacto
             await transaction.CommitAsync();
             return result;
         }
-        catch (DbUpdateException ex) when (IsUniqueConstraintViolation(ex) && uniqueConstraintErrorKey is not null)
+        catch (DbUpdateException ex) when (DatabaseErrorClassifier.IsUniqueConstraintViolation(ex) && uniqueConstraintErrorKey is not null)
         {
             await transaction.RollbackAsync();
             return Result<T>.Failure(uniqueConstraintErrorKey, errorArgs);
+        }
+        catch (Exception ex) when (DatabaseErrorClassifier.ClassifyErrorKey(ex) is string errorKey)
+        {
+            await transaction.RollbackAsync();
+            return Result<T>.Failure(errorKey);
         }
         catch
         {
             await transaction.RollbackAsync();
             throw;
         }
-    }
-
-    private static bool IsUniqueConstraintViolation(DbUpdateException ex)
-    {
-        return ex.InnerException is SqliteException { SqliteExtendedErrorCode: 2067 };
     }
 }

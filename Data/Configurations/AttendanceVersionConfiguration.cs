@@ -1,4 +1,4 @@
-﻿using AttendanceJournal.Models;
+using AttendanceJournal.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -9,7 +9,7 @@ internal class AttendanceVersionConfiguration : IEntityTypeConfiguration<Attenda
     public void Configure(EntityTypeBuilder<AttendanceVersion> builder)
     {
         builder.ToTable(t => t.HasCheckConstraint(
-            "CK_ATtendanceVersions_Grade",
+            "CK_AttendanceVersions_Grade",
             "[Grade] IS NULL OR ([Grade] >= 0 AND [Grade] <= 100)"));
 
         builder.Property(av => av.Status)
@@ -26,3 +26,6 @@ internal class AttendanceVersionConfiguration : IEntityTypeConfiguration<Attenda
             .IsUnique();
     }
 }
+
+
+

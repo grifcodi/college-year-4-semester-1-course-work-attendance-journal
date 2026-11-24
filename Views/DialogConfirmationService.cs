@@ -1,4 +1,4 @@
-﻿using AttendanceJournal.ViewModels;
+﻿using AttendanceJournal.ViewModels.Interfaces;
 using AttendanceJournal.ViewModels.Localization;
 using Avalonia;
 using Avalonia.Controls;

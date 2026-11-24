@@ -1,5 +1,6 @@
 ﻿using AttendanceJournal.Services.Interfaces;
 using AttendanceJournal.ViewModels;
+using AttendanceJournal.ViewModels.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AttendanceJournal.Tests;

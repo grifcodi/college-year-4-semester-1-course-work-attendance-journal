@@ -1,9 +1,10 @@
-﻿using AttendanceJournal.Services;
+using AttendanceJournal.Services;
 using AttendanceJournal.Tests.TestHelpers;
 using AttendanceJournal.ViewModels;
 
 namespace AttendanceJournal.Tests;
 
+[Collection(AttendanceJournal.Tests.TestHelpers.LocalizerCollection.Name)]
 public class T18_GroupsPageViewModelTests : SqliteInMemoryTestBase
 {
     private readonly FakeConfirmationService _confirm = new();
@@ -98,3 +99,5 @@ public class T18_GroupsPageViewModelTests : SqliteInMemoryTestBase
         Assert.Null(page.StartupErrorMessage);
     }
 }
+
+

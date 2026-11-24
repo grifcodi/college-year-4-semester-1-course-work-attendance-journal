@@ -1,4 +1,4 @@
-﻿using AttendanceJournal.Data;
+using AttendanceJournal.Data;
 using AttendanceJournal.Models;
 using AttendanceJournal.Services.Common;
 using AttendanceJournal.Services.Interfaces;
@@ -28,10 +28,10 @@ public class AttendanceService(IDbContextFactory<AppDbContext> dbContextFactory)
             .AsNoTracking()
             .Where(s => s.StudentGroupId == lesson.StudentGroupId
                         && (!s.IsArchived || markedIds.Contains(s.StudentId)))
-            .OrderBy(s => s.FullName)
             .ToListAsync();
 
         return [.. sheetStudents
+            .OrderByName(s => s.FullName)
             .Select(s => new LessonStudentRowDto(
                 s.StudentId,
                 s.FullName,
@@ -356,3 +356,5 @@ public class AttendanceService(IDbContextFactory<AppDbContext> dbContextFactory)
             .ToListAsync();
     }
 }
+
+

@@ -1,4 +1,4 @@
-﻿using AttendanceJournal.Models;
+using AttendanceJournal.Models;
 using AttendanceJournal.Services;
 using AttendanceJournal.Services.Common;
 using AttendanceJournal.Tests.TestHelpers;
@@ -7,6 +7,7 @@ using AttendanceJournal.ViewModels.Localization;
 
 namespace AttendanceJournal.Tests;
 
+[Collection(AttendanceJournal.Tests.TestHelpers.LocalizerCollection.Name)]
 public class T16_GroupListViewModelTests : SqliteInMemoryTestBase
 {
     private readonly FakeConfirmationService _confirm = new();
@@ -201,3 +202,5 @@ public class T16_GroupListViewModelTests : SqliteInMemoryTestBase
         await Assert.ThrowsAsync<InvalidOperationException>(() => vm.LoadCoreAsync());
     }
 }
+
+

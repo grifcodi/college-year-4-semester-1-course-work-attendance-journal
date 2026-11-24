@@ -1,4 +1,4 @@
-﻿using AttendanceJournal.Models;
+using AttendanceJournal.Models;
 using AttendanceJournal.Services.Common;
 using AttendanceJournal.Services.Interfaces;
 using AttendanceJournal.Tests.TestHelpers;
@@ -6,6 +6,7 @@ using AttendanceJournal.ViewModels;
 
 namespace AttendanceJournal.Tests;
 
+[Collection(AttendanceJournal.Tests.TestHelpers.LocalizerCollection.Name)]
 public class T17b_StaleLoadTests
 {
     private sealed class GatedStudentService : IStudentService
@@ -42,3 +43,5 @@ public class T17b_StaleLoadTests
         Assert.Equal(["Б"], vm.Students.Select(s => s.FullName));
     }
 }
+
+

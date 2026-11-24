@@ -1,5 +1,6 @@
-﻿using AttendanceJournal.Models;
+using AttendanceJournal.Models;
 using AttendanceJournal.Services.Interfaces;
+using AttendanceJournal.ViewModels.Interfaces;
 using AttendanceJournal.ViewModels.Localization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -34,17 +35,17 @@ public partial class GroupListViewModel(
 
     partial void OnSelectedGroupChanged(StudentGroup? value)
     {
-        ErrorMessage = null;
+        ClearError();
         CancelEdit();
         SelectedGroupIdChanged?.Invoke(value?.StudentGroupId);
     }
 
     partial void OnShowArchivedChanged(bool value) => _ = LoadAsync();
 
-    public async Task LoadCoreAsync()
+    public async Task LoadCoreAsync(int? selectGroupId = null)
     {
         var version = ++_loadVersion;
-        var previousId = SelectedGroup?.StudentGroupId;
+        var previousId = selectGroupId ?? SelectedGroup?.StudentGroupId;
 
         var items = await groupService.GetAllAsync(ShowArchived);
         if (version != _loadVersion)
@@ -58,12 +59,12 @@ public partial class GroupListViewModel(
                         ?? Groups.FirstOrDefault();
     }
 
-    public Task LoadAsync() => RunSafeAsync("GroupList.Load", LoadCoreAsync);
+    public Task LoadAsync() => RunSafeAsync("GroupList.Load", () => LoadCoreAsync(), allowRetry: true);
 
     [RelayCommand]
     private Task SaveAsync() => RunSafeAsync("GroupList.Save", async () =>
     {
-        ErrorMessage = null;
+        ClearError();
 
         var result = IsEditing && SelectedGroup is not null
             ? await groupService.UpdateAsync(SelectedGroup.StudentGroupId, GroupNameInput, AcademicYearInput)
@@ -76,8 +77,8 @@ public partial class GroupListViewModel(
         }
 
         CancelEdit();
-        await LoadCoreAsync();
-    });
+        await LoadCoreAsync(result.Value?.StudentGroupId);
+    }, allowRetry: true);
 
     [RelayCommand]
     private void StartEdit()
@@ -104,7 +105,7 @@ public partial class GroupListViewModel(
         if (group is null)
             return;
 
-        ErrorMessage = null;
+        ClearError();
 
         if (!group.IsArchived)
         {
@@ -124,5 +125,7 @@ public partial class GroupListViewModel(
         }
 
         await LoadCoreAsync();
-    });
+    }, allowRetry: true);
 }
+
+

@@ -1,4 +1,4 @@
-﻿using AttendanceJournal.Data;
+using AttendanceJournal.Data;
 using AttendanceJournal.Models;
 using AttendanceJournal.Services.Common;
 using AttendanceJournal.Services.Interfaces;
@@ -17,7 +17,8 @@ public class SubjectService(IDbContextFactory<AppDbContext> dbContextFactory)
         if (!includeArchived)
             query = query.Where(s => !s.IsArchived);
 
-        return await query.OrderBy(s => s.Name).ToListAsync();
+        var subjects = await query.ToListAsync();
+        return subjects.OrderByName(s => s.Name).ToList();
     }
 
     public async Task<Result<Subject>> CreateAsync(string name)
@@ -137,3 +138,6 @@ public class SubjectService(IDbContextFactory<AppDbContext> dbContextFactory)
             NameNormalizer.Normalize(trimmed)));
     }
 }
+
+
+

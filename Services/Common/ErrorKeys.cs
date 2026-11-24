@@ -5,6 +5,8 @@ public static class ErrorKeys
     public const string DatabaseUnavailable = "Err_Database_Unavailable";
     public const string DatabaseConflict = "Err_Database_Conflict";
     public const string EntityNotFound = "Err_Entity_NotFound";
+    public const string DatabaseBusy = "Err_Database_Busy";
+
 
     public const string SubjectNameRequired = "Err_Subject_NameRequired";
     public const string SubjectNameTooLong = "Err_Subject_NameTooLong";
@@ -20,6 +22,7 @@ public static class ErrorKeys
     public const string StudentNameRequired = "Err_Student_NameRequired";
     public const string StudentNameTooLong = "Err_Student_NameTooLong";
     public const string StudentAlreadyExists = "Err_Student_AlreadyExists";
+    public const string StudentGroupArchived = "Err_Student_GroupArchived";
 
     public const string LessonInvalidPairNumber = "Err_Lesson_InvalidPairNumber";
     public const string LessonTopicTooLong = "Err_Lesson_TopicTooLong";
