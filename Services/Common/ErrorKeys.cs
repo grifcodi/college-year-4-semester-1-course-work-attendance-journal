@@ -27,6 +27,12 @@ public static class ErrorKeys
     public const string LessonInvalidPairNumber = "Err_Lesson_InvalidPairNumber";
     public const string LessonTopicTooLong = "Err_Lesson_TopicTooLong";
     public const string LessonDuplicateSlot = "Err_Lesson_DuplicateSlot";
+    public const string LessonSeriesInvalidRange = "Err_LessonSeries_InvalidRange";
+    public const string LessonSeriesTooLong = "Err_LessonSeries_TooLong";
+    public const string LessonSeriesInvalidInterval = "Err_LessonSeries_InvalidInterval";
+    public const string LessonSeriesNoDates = "Err_LessonSeries_NoDates";
+    public const string LessonSeriesAllTaken = "Err_LessonSeries_AllTaken";
+    public const string LessonSeriesConflict = "Err_LessonSeries_Conflict";
 
     public const string AttendanceInvalidGrade = "Err_Attendance_InvalidGrade";
     public const string AttendanceNoteTooLong = "Err_Attendance_NoteTooLong";

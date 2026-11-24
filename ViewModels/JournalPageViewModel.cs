@@ -74,6 +74,128 @@ public partial class JournalPageViewModel(
     [ObservableProperty]
     public partial string HistoryTitle { get; set; } = string.Empty;
 
+    // ---------- Repeating lesson (series) ----------
+
+    public ObservableCollection<SelectOption<DayOfWeek>> SeriesDayOptions { get; } = [];
+    public ObservableCollection<SelectOption<int>> SeriesIntervalOptions { get; } = [];
+
+    /// <summary>When true, the "new lesson" form creates a series instead of a single lesson.</summary>
+    [ObservableProperty]
+    public partial bool IsSeriesMode { get; set; }
+
+    [ObservableProperty]
+    public partial SelectOption<DayOfWeek>? SelectedSeriesDay { get; set; }
+
+    [ObservableProperty]
+    public partial SelectOption<int>? SelectedSeriesInterval { get; set; }
+
+    [ObservableProperty]
+    public partial DateTime? SeriesStartDate { get; set; }
+
+    [ObservableProperty]
+    public partial DateTime? SeriesEndDate { get; set; }
+
+    partial void OnIsSeriesModeChanged(bool value)
+    {
+        if (!value)
+            return;
+
+        // Start from the date picked on the left: same weekday, until the end of the semester.
+        var start = SelectedDate ?? DateTime.Today;
+        SeriesStartDate = start.Date;
+        SeriesEndDate = SemesterEnd(start.Date);
+        RebuildSeriesOptions(start.DayOfWeek);
+    }
+
+    /// <summary>31 December for the autumn semester (July – December), 30 June for the spring one.</summary>
+    public static DateTime SemesterEnd(DateTime date) =>
+        date.Month >= 7 ? new DateTime(date.Year, 12, 31) : new DateTime(date.Year, 6, 30);
+
+    private void RebuildSeriesOptions(DayOfWeek? selectDay = null)
+    {
+        var day = selectDay ?? SelectedSeriesDay?.Value ?? DayOfWeek.Monday;
+        var interval = SelectedSeriesInterval?.Value ?? 1;
+
+        SeriesDayOptions.Clear();
+        DayOfWeek[] week =
+        [
+            DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday,
+            DayOfWeek.Friday, DayOfWeek.Saturday, DayOfWeek.Sunday,
+        ];
+        foreach (var d in week)
+            SeriesDayOptions.Add(new SelectOption<DayOfWeek>(d, DisplayText.DayName(d)));
+        SelectedSeriesDay = SeriesDayOptions.First(o => o.Value == day);
+
+        SeriesIntervalOptions.Clear();
+        SeriesIntervalOptions.Add(new SelectOption<int>(1, Localizer.Translate(UiTextKeys.RepeatEveryWeek)));
+        SeriesIntervalOptions.Add(new SelectOption<int>(2, Localizer.Translate(UiTextKeys.RepeatEveryTwoWeeks)));
+        SeriesIntervalOptions.Add(new SelectOption<int>(3, Localizer.Translate(UiTextKeys.RepeatEveryThreeWeeks)));
+        SeriesIntervalOptions.Add(new SelectOption<int>(4, Localizer.Translate(UiTextKeys.RepeatEveryFourWeeks)));
+        SelectedSeriesInterval = SeriesIntervalOptions.FirstOrDefault(o => o.Value == interval) ?? SeriesIntervalOptions[0];
+    }
+
+    /// <summary>
+    /// Creates a repeating lesson: shows how many lessons will be created and which dates are skipped,
+    /// asks for confirmation, then creates them all in one transaction.
+    /// </summary>
+    [RelayCommand]
+    private Task CreateSeriesAsync() => RunSafeAsync("Journal.CreateSeries", async () =>
+    {
+        if (SelectedGroup is null || NewLessonSubject is null || SelectedSeriesDay is null
+            || SeriesStartDate is null || SeriesEndDate is null)
+            return;
+
+        ClearError();
+        InfoMessage = null;
+
+        var request = new LessonSeriesRequest(
+            SelectedGroup.StudentGroupId,
+            NewLessonSubject.SubjectId,
+            SelectedSeriesDay.Value,
+            NewLessonPair,
+            DateOnly.FromDateTime(SeriesStartDate.Value),
+            DateOnly.FromDateTime(SeriesEndDate.Value),
+            SelectedSeriesInterval?.Value ?? 1,
+            NewLessonTopic);
+
+        var plan = await lessonService.PlanSeriesAsync(request);
+        if (!plan.IsSuccess)
+        {
+            ErrorMessage = Localizer.TranslateError(plan);
+            return;
+        }
+
+        var dates = plan.Value!.NewDates;
+        var message = Localizer.Translate(
+            UiTextKeys.ConfirmCreateSeries,
+            dates.Count,
+            SelectedSeriesDay.Text,
+            NewLessonPair,
+            DisplayText.Date(dates[0]),
+            DisplayText.Date(dates[^1]),
+            plan.Value.TakenDates.Count);
+
+        if (!await confirmation.ConfirmAsync(message))
+            return;
+
+        if (HasUnsavedChanges && !await ConfirmDiscardAsync())
+            return;
+
+        var result = await lessonService.CreateSeriesAsync(request);
+        if (!result.IsSuccess)
+        {
+            ErrorMessage = Localizer.TranslateError(result);
+            return;
+        }
+
+        NewLessonTopic = string.Empty;
+        await LoadLessonsCoreAsync(SelectedLesson?.LessonId);
+        ShowInfo(Localizer.Translate(
+            UiTextKeys.SeriesCreatedInfo,
+            result.Value!.CreatedLessonIds.Count,
+            result.Value.SkippedDates.Count));
+    }, allowRetry: true);
+
     public bool HasLesson => SelectedLesson is not null;
     public bool HasNoLessons => Lessons.Count == 0;
     public bool HasUnsavedChanges => UnsavedCount > 0;
@@ -85,6 +207,8 @@ public partial class JournalPageViewModel(
     public Task ActivateAsync() => RunSafeAsync("Journal.Activate", async () =>
     {
         await LoadPickersAsync();
+        if (IsSeriesMode)
+            RebuildSeriesOptions();
 
         // Do not throw away marks the teacher has not saved yet.
         if (!HasUnsavedChanges)

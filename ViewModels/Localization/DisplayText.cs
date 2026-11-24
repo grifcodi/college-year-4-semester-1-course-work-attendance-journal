@@ -35,6 +35,7 @@ public static class DisplayText
         AuditAction.MarkAttendance => UiTextKeys.ActionMarkAttendance,
         AuditAction.BulkImport => UiTextKeys.ActionBulkImport,
         AuditAction.RestoreVersion => UiTextKeys.ActionRestoreVersion,
+        AuditAction.CreateSeries => UiTextKeys.ActionCreateSeries,
         _ => action.ToString(),
     });
 
@@ -74,6 +75,20 @@ public static class DisplayText
         catch (CultureNotFoundException)
         {
             return $"{month:00}.{year}";
+        }
+    }
+
+    /// <summary>Weekday name in the current UI language, for example "понеділок".</summary>
+    public static string DayName(DayOfWeek day)
+    {
+        try
+        {
+            var culture = new CultureInfo(Localizer.CurrentLanguage == AppLanguage.En ? "en-US" : "uk-UA");
+            return culture.DateTimeFormat.GetDayName(day);
+        }
+        catch (CultureNotFoundException)
+        {
+            return day.ToString();
         }
     }
 

@@ -189,4 +189,18 @@ public static class UiTextKeys
     public const string ArchivedSuffix = "Ui_ArchivedSuffix";
     public const string CurrentVersionBadge = "Ui_CurrentVersionBadge";
     public const string ClearFiltersButton = "Ui_ClearFiltersButton";
+
+    // Повторювані заняття
+    public const string RepeatLessonOption = "Ui_RepeatLessonOption";
+    public const string LabelDayOfWeek = "Ui_LabelDayOfWeek";
+    public const string LabelRepeat = "Ui_LabelRepeat";
+    public const string RepeatEveryWeek = "Ui_RepeatEveryWeek";
+    public const string RepeatEveryTwoWeeks = "Ui_RepeatEveryTwoWeeks";
+    public const string RepeatEveryThreeWeeks = "Ui_RepeatEveryThreeWeeks";
+    public const string RepeatEveryFourWeeks = "Ui_RepeatEveryFourWeeks";
+    public const string SeriesHint = "Ui_SeriesHint";
+    public const string CreateSeriesButton = "Ui_CreateSeriesButton";
+    public const string ConfirmCreateSeries = "Ui_ConfirmCreateSeries";
+    public const string SeriesCreatedInfo = "Ui_SeriesCreatedInfo";
+    public const string ActionCreateSeries = "Ui_ActionCreateSeries";
 }

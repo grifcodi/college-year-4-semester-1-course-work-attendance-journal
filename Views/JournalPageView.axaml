@@ -65,8 +65,27 @@
                     <TextBlock Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_LabelPair]}" />
                     <ComboBox ItemsSource="{Binding PairNumbers}" SelectedItem="{Binding NewLessonPair}" MinWidth="80" />
                     <TextBox PlaceholderText="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_TopicPlaceholder]}" Text="{Binding NewLessonTopic}" MaxLength="250" />
+                    <CheckBox Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_RepeatLessonOption]}" IsChecked="{Binding IsSeriesMode}" Margin="0,4,0,0" />
+
+                    <!-- Одне заняття на обрану дату -->
                     <Button Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_CreateLessonButton]}" Command="{Binding CreateLessonCommand}"
-                            Classes="accent" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                            Classes="accent" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                            IsVisible="{Binding !IsSeriesMode}" />
+
+                    <!-- Повторюване заняття: день тижня, повторення, діапазон дат -->
+                    <StackPanel Spacing="6" IsVisible="{Binding IsSeriesMode}">
+                        <TextBlock Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_LabelDayOfWeek]}" />
+                        <ComboBox ItemsSource="{Binding SeriesDayOptions}" SelectedItem="{Binding SelectedSeriesDay}" HorizontalAlignment="Stretch" />
+                        <TextBlock Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_LabelRepeat]}" />
+                        <ComboBox ItemsSource="{Binding SeriesIntervalOptions}" SelectedItem="{Binding SelectedSeriesInterval}" HorizontalAlignment="Stretch" />
+                        <TextBlock Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_LabelFrom]}" />
+                        <CalendarDatePicker SelectedDate="{Binding SeriesStartDate}" HorizontalAlignment="Stretch" />
+                        <TextBlock Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_LabelTo]}" />
+                        <CalendarDatePicker SelectedDate="{Binding SeriesEndDate}" HorizontalAlignment="Stretch" />
+                        <TextBlock Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_SeriesHint]}" FontSize="11" TextWrapping="Wrap" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                        <Button Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_CreateSeriesButton]}" Command="{Binding CreateSeriesCommand}"
+                                Classes="accent" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                    </StackPanel>
                 </StackPanel>
             </ScrollViewer>
         </Border>
