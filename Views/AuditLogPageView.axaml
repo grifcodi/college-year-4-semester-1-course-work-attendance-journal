@@ -1,0 +1,89 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AttendanceJournal.ViewModels"
+             xmlns:models="using:AttendanceJournal.Models"
+             xmlns:loc="using:AttendanceJournal.ViewModels.Localization"
+             x:Class="AttendanceJournal.Views.AuditLogPageView"
+             x:DataType="vm:AuditLogPageViewModel">
+
+    <DockPanel Margin="16">
+        <TextBlock DockPanel.Dock="Top" Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_NavAuditLog]}" FontSize="18" FontWeight="Bold" Margin="0,0,0,8" />
+
+        <!-- Фільтри (FR-12) -->
+        <WrapPanel DockPanel.Dock="Top" Margin="0,0,0,8">
+            <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,16,6">
+                <TextBlock Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_LabelFrom]}" VerticalAlignment="Center" />
+                <CalendarDatePicker SelectedDate="{Binding FromDate}" />
+                <TextBlock Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_LabelTo]}" VerticalAlignment="Center" />
+                <CalendarDatePicker SelectedDate="{Binding ToDate}" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,16,6">
+                <ComboBox ItemsSource="{Binding EntityTypeOptions}" SelectedItem="{Binding SelectedEntityType}" MinWidth="190" />
+                <ComboBox ItemsSource="{Binding ActionOptions}" SelectedItem="{Binding SelectedAction}" MinWidth="190" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,0,6">
+                <Button Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_RefreshButton]}" Command="{Binding LoadCommand}" />
+                <Button Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_ClearFiltersButton]}" Command="{Binding ClearFiltersCommand}" />
+            </StackPanel>
+        </WrapPanel>
+
+        <!-- Банер помилки -->
+        <Border DockPanel.Dock="Top" Background="{DynamicResource ErrorBannerBackgroundBrush}"
+                BorderBrush="{DynamicResource ErrorBannerBorderBrush}"
+                BorderThickness="1" CornerRadius="6" Padding="10,6" Margin="0,0,0,8"
+                IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+            <DockPanel>
+                <Button DockPanel.Dock="Right" Margin="8,0,0,0"
+                        Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_RetryButton]}"
+                        Command="{Binding RetryLastOperationCommand}"
+                        IsVisible="{Binding CanRetry}" />
+                <TextBlock Text="{Binding ErrorMessage}"
+                           Foreground="{DynamicResource ErrorBannerTextBrush}"
+                           FontSize="12" TextWrapping="Wrap" VerticalAlignment="Center" />
+            </DockPanel>
+        </Border>
+        <!-- Банер успішної операції -->
+        <Border DockPanel.Dock="Top" Background="{DynamicResource InfoBannerBackgroundBrush}"
+                BorderBrush="{DynamicResource InfoBannerBorderBrush}"
+                BorderThickness="1" CornerRadius="6" Padding="10,6" Margin="0,0,0,8"
+                IsVisible="{Binding InfoMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+            <TextBlock Text="{Binding InfoMessage}"
+                       Foreground="{DynamicResource InfoBannerTextBrush}"
+                       FontSize="12" TextWrapping="Wrap" />
+        </Border>
+
+        <StackPanel DockPanel.Dock="Top" Margin="0,0,0,8">
+            <TextBlock Text="{Binding ShownText}" FontWeight="SemiBold" />
+            <TextBlock Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_AuditReadOnlyNote]}" FontSize="12" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+        </StackPanel>
+
+        <Border Background="{DynamicResource SystemControlBackgroundAltHighBrush}" BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="1" CornerRadius="8" Padding="12">
+            <DockPanel>
+                <Grid DockPanel.Dock="Top" ColumnDefinitions="150,170,170,60,*" Margin="0,0,16,6">
+                    <TextBlock Grid.Column="0" Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_AuditColumnTime]}" FontWeight="SemiBold" />
+                    <TextBlock Grid.Column="1" Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_AuditColumnAction]}" FontWeight="SemiBold" />
+                    <TextBlock Grid.Column="2" Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_AuditColumnEntity]}" FontWeight="SemiBold" />
+                    <TextBlock Grid.Column="3" Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_AuditColumnId]}" FontWeight="SemiBold" />
+                    <TextBlock Grid.Column="4" Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_AuditColumnDetails]}" FontWeight="SemiBold" />
+                </Grid>
+                <ScrollViewer>
+                    <ItemsControl ItemsSource="{Binding Entries}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:AuditRowViewModel">
+                                <Border BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="0,0,0,1" Padding="0,4">
+                                    <Grid ColumnDefinitions="150,170,170,60,*">
+                                        <TextBlock Grid.Column="0" Text="{Binding TimeText}" FontSize="12" />
+                                        <TextBlock Grid.Column="1" Text="{Binding ActionText}" TextWrapping="Wrap" />
+                                        <TextBlock Grid.Column="2" Text="{Binding EntityText}" TextWrapping="Wrap" />
+                                        <TextBlock Grid.Column="3" Text="{Binding EntityIdText}" />
+                                        <SelectableTextBlock Grid.Column="4" Text="{Binding Details}" FontSize="12" TextWrapping="Wrap" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </DockPanel>
+        </Border>
+    </DockPanel>
+</UserControl>

@@ -1,4 +1,4 @@
-﻿using AttendanceJournal.Data;
+using AttendanceJournal.Data;
 using AttendanceJournal.Services;
 using AttendanceJournal.Services.Common;
 using AttendanceJournal.Services.Interfaces;
@@ -27,13 +27,27 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IErrorLog, FileErrorLog>();
         services.AddSingleton<ISummaryService, SummaryService>();
         services.AddSingleton<ISettingService, SettingService>();
+        services.AddSingleton<IMonthGridService, MonthGridService>();
+        services.AddSingleton<IAuditLogService, AuditLogService>();
+        services.AddSingleton<IStudentFileReader, StudentFileReader>();
+        services.AddSingleton<IStudentImportService, StudentImportService>();
+        services.AddSingleton<IAttendanceExportService, AttendanceExportService>();
+
+        // Avalonia implementations of the interfaces that view models use (Views/).
         services.AddSingleton<IThemeApplier, AvaloniaThemeApplier>();
         services.AddSingleton<IConfirmationService, DialogConfirmationService>();
+        services.AddSingleton<IFileDialogService, AvaloniaFileDialogService>();
 
         services.AddTransient<SettingsPageViewModel>();
         services.AddTransient<GroupListViewModel>();
         services.AddTransient<StudentListViewModel>();
+        services.AddTransient<StudentImportViewModel>();
         services.AddTransient<GroupsPageViewModel>();
+        services.AddTransient<SubjectsPageViewModel>();
+        services.AddTransient<JournalPageViewModel>();
+        services.AddTransient<MonthGridPageViewModel>();
+        services.AddTransient<SummaryPageViewModel>();
+        services.AddTransient<AuditLogPageViewModel>();
         services.AddTransient<MainViewModel>();
 
         return services;

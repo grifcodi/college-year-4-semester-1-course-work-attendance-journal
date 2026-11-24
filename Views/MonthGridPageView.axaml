@@ -1,0 +1,141 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AttendanceJournal.ViewModels"
+             xmlns:models="using:AttendanceJournal.Models"
+             xmlns:loc="using:AttendanceJournal.ViewModels.Localization"
+             x:Class="AttendanceJournal.Views.MonthGridPageView"
+             x:DataType="vm:MonthGridPageViewModel">
+
+    <UserControl.Styles>
+        <Style Selector="Button.cell">
+            <Setter Property="Width" Value="44" />
+            <Setter Property="Height" Value="38" />
+            <Setter Property="Margin" Value="1" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+        <Style Selector="Button.cell.present"><Setter Property="Background" Value="{DynamicResource StatusPresentTintBrush}" /></Style>
+        <Style Selector="Button.cell.absent"><Setter Property="Background" Value="{DynamicResource StatusAbsentTintBrush}" /></Style>
+        <Style Selector="Button.cell.late"><Setter Property="Background" Value="{DynamicResource StatusLateTintBrush}" /></Style>
+        <Style Selector="Button.cell.excused"><Setter Property="Background" Value="{DynamicResource StatusExcusedTintBrush}" /></Style>
+    </UserControl.Styles>
+
+    <DockPanel Margin="16">
+        <TextBlock DockPanel.Dock="Top" Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_NavMonthGrid]}" FontSize="18" FontWeight="Bold" Margin="0,0,0,8" />
+
+        <!-- Фільтри -->
+        <WrapPanel DockPanel.Dock="Top" Margin="0,0,0,8">
+            <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,16,6">
+                <TextBlock Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_LabelGroup]}" VerticalAlignment="Center" />
+                <ComboBox ItemsSource="{Binding Groups}" SelectedItem="{Binding SelectedGroup}" MinWidth="160" VerticalAlignment="Center">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate x:DataType="models:StudentGroup">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBlock Text="{Binding Name}" />
+                                <TextBlock Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_ArchivedBadge]}" FontSize="10" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource WarningBadgeBrush}" VerticalAlignment="Center"
+                                           IsVisible="{Binding IsArchived}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <CheckBox Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_ShowArchivedGroupsOption]}" IsChecked="{Binding ShowArchivedGroups}" VerticalAlignment="Center" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,16,6">
+                <TextBlock Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_LabelSubject]}" VerticalAlignment="Center" />
+                <ComboBox ItemsSource="{Binding SubjectOptions}" SelectedItem="{Binding SelectedSubjectOption}" MinWidth="200" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,0,6">
+                <Button Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_PrevMonthButton]}" Command="{Binding PreviousMonthCommand}" />
+                <TextBlock Text="{Binding MonthTitle}" FontWeight="SemiBold" MinWidth="130" TextAlignment="Center" VerticalAlignment="Center" />
+                <Button Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_NextMonthButton]}" Command="{Binding NextMonthCommand}" />
+                <Button Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_RefreshButton]}" Command="{Binding LoadGridCommand}" />
+            </StackPanel>
+        </WrapPanel>
+
+        <!-- Банер помилки -->
+        <Border DockPanel.Dock="Top" Background="{DynamicResource ErrorBannerBackgroundBrush}"
+                BorderBrush="{DynamicResource ErrorBannerBorderBrush}"
+                BorderThickness="1" CornerRadius="6" Padding="10,6" Margin="0,0,0,8"
+                IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+            <DockPanel>
+                <Button DockPanel.Dock="Right" Margin="8,0,0,0"
+                        Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_RetryButton]}"
+                        Command="{Binding RetryLastOperationCommand}"
+                        IsVisible="{Binding CanRetry}" />
+                <TextBlock Text="{Binding ErrorMessage}"
+                           Foreground="{DynamicResource ErrorBannerTextBrush}"
+                           FontSize="12" TextWrapping="Wrap" VerticalAlignment="Center" />
+            </DockPanel>
+        </Border>
+        <!-- Банер успішної операції -->
+        <Border DockPanel.Dock="Top" Background="{DynamicResource InfoBannerBackgroundBrush}"
+                BorderBrush="{DynamicResource InfoBannerBorderBrush}"
+                BorderThickness="1" CornerRadius="6" Padding="10,6" Margin="0,0,0,8"
+                IsVisible="{Binding InfoMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+            <TextBlock Text="{Binding InfoMessage}"
+                       Foreground="{DynamicResource InfoBannerTextBrush}"
+                       FontSize="12" TextWrapping="Wrap" />
+        </Border>
+
+        <TextBlock DockPanel.Dock="Top" Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_MonthGridLegend]}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,8" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+        <TextBlock DockPanel.Dock="Top" Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_NoLessonsInMonth]}" Margin="0,8" IsVisible="{Binding HasNoLessons}" />
+
+        <!-- Сітка: рядки — студенти, колонки — заняття -->
+        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" IsVisible="{Binding !HasNoLessons}">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Border Width="240" />
+                    <ItemsControl ItemsSource="{Binding Columns}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:GridColumnViewModel">
+                                <StackPanel Width="46" ToolTip.Tip="{Binding Tooltip}">
+                                    <TextBlock Text="{Binding DayText}" FontSize="11" FontWeight="SemiBold" HorizontalAlignment="Center" />
+                                    <TextBlock Text="{Binding PairText}" FontSize="10" HorizontalAlignment="Center" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+
+                <ItemsControl ItemsSource="{Binding Rows}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:GridRowViewModel">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding DisplayName}" Width="240" VerticalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding DisplayName}" />
+                                <ItemsControl ItemsSource="{Binding Cells}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="vm:GridCellViewModel">
+                                            <Button Classes="cell"
+                                                    Classes.present="{Binding IsPresent}"
+                                                    Classes.absent="{Binding IsAbsent}"
+                                                    Classes.late="{Binding IsLate}"
+                                                    Classes.excused="{Binding IsExcused}"
+                                                    ToolTip.Tip="{Binding Tooltip}"
+                                                    Command="{Binding $parent[UserControl].((vm:MonthGridPageViewModel)DataContext).OpenCellCommand}"
+                                                    CommandParameter="{Binding}">
+                                                <StackPanel>
+                                                    <TextBlock Text="{Binding Letter}" FontWeight="SemiBold" HorizontalAlignment="Center" />
+                                                    <TextBlock Text="{Binding GradeText}" FontSize="10" HorizontalAlignment="Center"
+                                                               IsVisible="{Binding HasGrade}" />
+                                                </StackPanel>
+                                            </Button>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+</UserControl>

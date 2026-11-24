@@ -1,0 +1,121 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AttendanceJournal.ViewModels"
+             xmlns:models="using:AttendanceJournal.Models"
+             xmlns:loc="using:AttendanceJournal.ViewModels.Localization"
+             x:Class="AttendanceJournal.Views.SummaryPageView"
+             x:DataType="vm:SummaryPageViewModel">
+
+    <DockPanel Margin="16">
+        <TextBlock DockPanel.Dock="Top" Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_NavSummary]}" FontSize="18" FontWeight="Bold" Margin="0,0,0,8" />
+
+        <!-- Фільтри -->
+        <WrapPanel DockPanel.Dock="Top" Margin="0,0,0,4">
+            <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,16,6">
+                <TextBlock Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_LabelGroup]}" VerticalAlignment="Center" />
+                <ComboBox ItemsSource="{Binding Groups}" SelectedItem="{Binding SelectedGroup}" MinWidth="160" VerticalAlignment="Center">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate x:DataType="models:StudentGroup">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBlock Text="{Binding Name}" />
+                                <TextBlock Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_ArchivedBadge]}" FontSize="10" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource WarningBadgeBrush}" VerticalAlignment="Center"
+                                           IsVisible="{Binding IsArchived}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <CheckBox Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_ShowArchivedGroupsOption]}" IsChecked="{Binding ShowArchivedGroups}" VerticalAlignment="Center" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,16,6">
+                <TextBlock Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_LabelSubject]}" VerticalAlignment="Center" />
+                <ComboBox ItemsSource="{Binding SubjectOptions}" SelectedItem="{Binding SelectedSubjectOption}" MinWidth="200" />
+            </StackPanel>
+        </WrapPanel>
+        <WrapPanel DockPanel.Dock="Top" Margin="0,0,0,8">
+            <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,16,6">
+                <TextBlock Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_LabelFrom]}" VerticalAlignment="Center" />
+                <CalendarDatePicker SelectedDate="{Binding FromDate}" />
+                <TextBlock Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_LabelTo]}" VerticalAlignment="Center" />
+                <CalendarDatePicker SelectedDate="{Binding ToDate}" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,0,6">
+                <CheckBox Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_IncludeArchivedStudents]}" IsChecked="{Binding IncludeArchivedStudents}" VerticalAlignment="Center" />
+                <Button Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_ShowButton]}" Command="{Binding LoadCommand}" />
+            </StackPanel>
+        </WrapPanel>
+
+        <!-- Банер помилки -->
+        <Border DockPanel.Dock="Top" Background="{DynamicResource ErrorBannerBackgroundBrush}"
+                BorderBrush="{DynamicResource ErrorBannerBorderBrush}"
+                BorderThickness="1" CornerRadius="6" Padding="10,6" Margin="0,0,0,8"
+                IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+            <DockPanel>
+                <Button DockPanel.Dock="Right" Margin="8,0,0,0"
+                        Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_RetryButton]}"
+                        Command="{Binding RetryLastOperationCommand}"
+                        IsVisible="{Binding CanRetry}" />
+                <TextBlock Text="{Binding ErrorMessage}"
+                           Foreground="{DynamicResource ErrorBannerTextBrush}"
+                           FontSize="12" TextWrapping="Wrap" VerticalAlignment="Center" />
+            </DockPanel>
+        </Border>
+        <!-- Банер успішної операції -->
+        <Border DockPanel.Dock="Top" Background="{DynamicResource InfoBannerBackgroundBrush}"
+                BorderBrush="{DynamicResource InfoBannerBorderBrush}"
+                BorderThickness="1" CornerRadius="6" Padding="10,6" Margin="0,0,0,8"
+                IsVisible="{Binding InfoMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+            <TextBlock Text="{Binding InfoMessage}"
+                       Foreground="{DynamicResource InfoBannerTextBrush}"
+                       FontSize="12" TextWrapping="Wrap" />
+        </Border>
+
+        <!-- Експорт (FR-10) -->
+        <DockPanel DockPanel.Dock="Bottom" Margin="0,10,0,0">
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="8">
+                <Button Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_ExportCsvButton]}" Command="{Binding ExportCsvCommand}" />
+                <Button Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_ExportXlsxButton]}" Command="{Binding ExportXlsxCommand}" Classes="accent" />
+            </StackPanel>
+            <TextBlock Text="{Binding ExportRowsText}" VerticalAlignment="Center" />
+        </DockPanel>
+
+        <TextBlock DockPanel.Dock="Top" Text="{Binding GroupTotalsText}" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,0,0,8" />
+
+        <Border Background="{DynamicResource SystemControlBackgroundAltHighBrush}" BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="1" CornerRadius="8" Padding="12">
+            <DockPanel>
+                <Grid DockPanel.Dock="Top" ColumnDefinitions="*,90,90,90,120,110,120,120,120" Margin="0,0,16,6">
+                    <TextBlock Grid.Column="0" Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_ColumnStudent]}" FontWeight="SemiBold" TextWrapping="Wrap" />
+                    <TextBlock Grid.Column="1" Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_StatusPresent]}" FontWeight="SemiBold" TextWrapping="Wrap" TextAlignment="Right" />
+                    <TextBlock Grid.Column="2" Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_StatusLate]}" FontWeight="SemiBold" TextWrapping="Wrap" TextAlignment="Right" />
+                    <TextBlock Grid.Column="3" Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_StatusAbsent]}" FontWeight="SemiBold" TextWrapping="Wrap" TextAlignment="Right" />
+                    <TextBlock Grid.Column="4" Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_StatusExcused]}" FontWeight="SemiBold" TextWrapping="Wrap" TextAlignment="Right" />
+                    <TextBlock Grid.Column="5" Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_StatusNotMarked]}" FontWeight="SemiBold" TextWrapping="Wrap" TextAlignment="Right" />
+                    <TextBlock Grid.Column="6" Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_ColumnRate]}" FontWeight="SemiBold" TextWrapping="Wrap" TextAlignment="Right" />
+                    <TextBlock Grid.Column="7" Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_ColumnGradesCount]}" FontWeight="SemiBold" TextWrapping="Wrap" TextAlignment="Right" />
+                    <TextBlock Grid.Column="8" Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_ColumnAverage]}" FontWeight="SemiBold" TextWrapping="Wrap" TextAlignment="Right" />
+                </Grid>
+                <ScrollViewer>
+                    <ItemsControl ItemsSource="{Binding Rows}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:SummaryRowViewModel">
+                                <Border BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="0,0,0,1" Padding="0,4">
+                                    <Grid ColumnDefinitions="*,90,90,90,120,110,120,120,120">
+                                    <TextBlock Grid.Column="0" Text="{Binding DisplayName}" TextWrapping="Wrap" />
+                                    <TextBlock Grid.Column="1" Text="{Binding Present}" TextAlignment="Right" />
+                                    <TextBlock Grid.Column="2" Text="{Binding Late}" TextAlignment="Right" />
+                                    <TextBlock Grid.Column="3" Text="{Binding Absent}" TextAlignment="Right" />
+                                    <TextBlock Grid.Column="4" Text="{Binding Excused}" TextAlignment="Right" />
+                                    <TextBlock Grid.Column="5" Text="{Binding Unmarked}" TextAlignment="Right" />
+                                    <TextBlock Grid.Column="6" Text="{Binding RateText}" TextAlignment="Right" />
+                                    <TextBlock Grid.Column="7" Text="{Binding GradesCount}" TextAlignment="Right" />
+                                    <TextBlock Grid.Column="8" Text="{Binding AverageText}" TextAlignment="Right" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </DockPanel>
+        </Border>
+    </DockPanel>
+</UserControl>

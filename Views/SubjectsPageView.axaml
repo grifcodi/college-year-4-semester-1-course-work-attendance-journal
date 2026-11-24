@@ -1,0 +1,87 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AttendanceJournal.ViewModels"
+             xmlns:models="using:AttendanceJournal.Models"
+             xmlns:loc="using:AttendanceJournal.ViewModels.Localization"
+             x:Class="AttendanceJournal.Views.SubjectsPageView"
+             x:DataType="vm:SubjectsPageViewModel">
+
+    <Border Margin="16" MaxWidth="760" HorizontalAlignment="Left" Background="{DynamicResource SystemControlBackgroundAltHighBrush}" BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="1" CornerRadius="8" Padding="12">
+        <Grid RowDefinitions="Auto,Auto,Auto,*,Auto">
+            <DockPanel Grid.Row="0" Margin="0,0,0,8">
+                <CheckBox DockPanel.Dock="Right"
+                          Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_ArchiveFilter]}"
+                          IsChecked="{Binding ShowArchived}" />
+                <TextBlock Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_NavSubjects]}" FontSize="18" FontWeight="Bold" VerticalAlignment="Center" />
+            </DockPanel>
+
+            <StackPanel Grid.Row="1">
+                <!-- Банер помилки -->
+                <Border Background="{DynamicResource ErrorBannerBackgroundBrush}"
+                        BorderBrush="{DynamicResource ErrorBannerBorderBrush}"
+                        BorderThickness="1" CornerRadius="6" Padding="10,6" Margin="0,0,0,8"
+                        IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                    <DockPanel>
+                        <Button DockPanel.Dock="Right" Margin="8,0,0,0"
+                                Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_RetryButton]}"
+                                Command="{Binding RetryLastOperationCommand}"
+                                IsVisible="{Binding CanRetry}" />
+                        <TextBlock Text="{Binding ErrorMessage}"
+                                   Foreground="{DynamicResource ErrorBannerTextBrush}"
+                                   FontSize="12" TextWrapping="Wrap" VerticalAlignment="Center" />
+                    </DockPanel>
+                </Border>
+                <!-- Банер успішної операції -->
+                <Border Background="{DynamicResource InfoBannerBackgroundBrush}"
+                        BorderBrush="{DynamicResource InfoBannerBorderBrush}"
+                        BorderThickness="1" CornerRadius="6" Padding="10,6" Margin="0,0,0,8"
+                        IsVisible="{Binding InfoMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                    <TextBlock Text="{Binding InfoMessage}"
+                               Foreground="{DynamicResource InfoBannerTextBrush}"
+                               FontSize="12" TextWrapping="Wrap" />
+                </Border>
+            </StackPanel>
+
+            <!-- Форма створення / перейменування -->
+            <Grid Grid.Row="2" ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,12">
+                <TextBox Grid.Column="0"
+                         PlaceholderText="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_SubjectNamePlaceholder]}"
+                         Text="{Binding NameInput}"
+                         MaxLength="150"
+                         Margin="0,0,8,0" />
+                <Button Grid.Column="1" Classes="accent" IsDefault="True"
+                        Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_SaveButton]}"
+                        Command="{Binding SaveCommand}" />
+                <Button Grid.Column="2" Margin="6,0,0,0"
+                        Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_CancelButton]}"
+                        Command="{Binding CancelEditCommand}"
+                        IsVisible="{Binding IsEditing}" />
+            </Grid>
+
+            <!-- Список дисциплін -->
+            <ListBox Grid.Row="3" ItemsSource="{Binding Subjects}" SelectedItem="{Binding SelectedSubject}" Background="Transparent">
+                <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="models:Subject">
+                        <Grid ColumnDefinitions="*,Auto,Auto" Margin="2">
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding Name}" />
+                                <TextBlock Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_ArchivedBadge]}"
+                                           FontSize="12" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource WarningBadgeBrush}"
+                                           IsVisible="{Binding IsArchived}" />
+                            </StackPanel>
+                            <Button Grid.Column="1" Margin="0,0,6,0" Padding="8,4"
+                                    Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_EditButton]}"
+                                    Command="{Binding $parent[ListBox].((vm:SubjectsPageViewModel)DataContext).StartEditCommand}"
+                                    CommandParameter="{Binding}" />
+                            <Button Grid.Column="2" Padding="8,4"
+                                    Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_ArchiveRestoreButton]}"
+                                    Command="{Binding $parent[ListBox].((vm:SubjectsPageViewModel)DataContext).ToggleArchiveCommand}"
+                                    CommandParameter="{Binding}" />
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Grid>
+    </Border>
+</UserControl>

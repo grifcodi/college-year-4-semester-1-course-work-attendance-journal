@@ -1,4 +1,4 @@
-﻿using AttendanceJournal.Services.Common;
+using AttendanceJournal.Services.Common;
 using AttendanceJournal.Services.Interfaces;
 using AttendanceJournal.ViewModels.Localization;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -6,7 +6,7 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace AttendanceJournal.ViewModels;
 
-public abstract partial class OperationViewModelBase(IErrorLog errorLog) : ObservableObject
+public abstract partial class OperationViewModelBase(IErrorLog errorLog) : ViewModelBase
 {
     private Func<Task>? _lastFailedAction;
 
@@ -15,6 +15,16 @@ public abstract partial class OperationViewModelBase(IErrorLog errorLog) : Obser
 
     [ObservableProperty]
     public partial bool CanRetry { get; set; }
+
+    /// <summary>Short success message (for example "Marks saved: 5."). Shown in the info banner.</summary>
+    [ObservableProperty]
+    public partial string? InfoMessage { get; set; }
+
+    protected void ShowInfo(string message)
+    {
+        ClearError();
+        InfoMessage = message;
+    }
 
     protected void ClearError()
     {
@@ -32,6 +42,7 @@ public abstract partial class OperationViewModelBase(IErrorLog errorLog) : Obser
         catch (Exception ex)
         {
             errorLog.Log(context, ex);
+            InfoMessage = null;
 
             var classifiedKey = DatabaseErrorClassifier.ClassifyErrorKey(ex);
             ErrorMessage = Localizer.TranslateError(

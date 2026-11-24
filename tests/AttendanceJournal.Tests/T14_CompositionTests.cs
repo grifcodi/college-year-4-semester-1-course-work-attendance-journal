@@ -1,4 +1,4 @@
-﻿using AttendanceJournal.Services.Interfaces;
+using AttendanceJournal.Services.Interfaces;
 using AttendanceJournal.ViewModels;
 using AttendanceJournal.ViewModels.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,6 +32,21 @@ public class T14_CompositionTests
     [InlineData(typeof(GroupListViewModel))]
     [InlineData(typeof(StudentListViewModel))]
     [InlineData(typeof(GroupsPageViewModel))]
+    [InlineData(typeof(ILessonService))]
+    [InlineData(typeof(IAttendanceService))]
+    [InlineData(typeof(ISummaryService))]
+    [InlineData(typeof(IMonthGridService))]
+    [InlineData(typeof(IAuditLogService))]
+    [InlineData(typeof(IStudentImportService))]
+    [InlineData(typeof(IAttendanceExportService))]
+    [InlineData(typeof(IFileDialogService))]
+    [InlineData(typeof(SubjectsPageViewModel))]
+    [InlineData(typeof(JournalPageViewModel))]
+    [InlineData(typeof(MonthGridPageViewModel))]
+    [InlineData(typeof(SummaryPageViewModel))]
+    [InlineData(typeof(AuditLogPageViewModel))]
+    [InlineData(typeof(StudentImportViewModel))]
+    [InlineData(typeof(MainViewModel))]
     public void Registered_Types_CanBeResolved(Type type)
     {
         using var provider = BuildProvider();

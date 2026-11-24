@@ -1,4 +1,4 @@
-﻿<Window xmlns="https://github.com/avaloniaui"
+<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:AttendanceJournal.ViewModels"
         xmlns:loc="using:AttendanceJournal.ViewModels.Localization"
@@ -30,8 +30,33 @@
                         Padding="10,8" />
 
                 <StackPanel DockPanel.Dock="Top" Spacing="4">
+                    <Button Content="{Binding NavJournalText}"
+                            Command="{Binding NavigateToJournalCommand}"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Left"
+                            Padding="10,8" />
+                    <Button Content="{Binding NavMonthGridText}"
+                            Command="{Binding NavigateToMonthGridCommand}"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Left"
+                            Padding="10,8" />
+                    <Button Content="{Binding NavSummaryText}"
+                            Command="{Binding NavigateToSummaryCommand}"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Left"
+                            Padding="10,8" />
                     <Button Content="{Binding NavGroupsText}"
                             Command="{Binding NavigateToGroupsCommand}"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Left"
+                            Padding="10,8" />
+                    <Button Content="{Binding NavSubjectsText}"
+                            Command="{Binding NavigateToSubjectsCommand}"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Left"
+                            Padding="10,8" />
+                    <Button Content="{Binding NavAuditLogText}"
+                            Command="{Binding NavigateToAuditLogCommand}"
                             HorizontalAlignment="Stretch"
                             HorizontalContentAlignment="Left"
                             Padding="10,8" />

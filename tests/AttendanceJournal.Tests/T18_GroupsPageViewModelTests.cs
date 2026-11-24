@@ -15,9 +15,12 @@ public class T18_GroupsPageViewModelTests : SqliteInMemoryTestBase
         var groups = new StudentGroupService(failingDatabase ? new ThrowingContextFactory() : ContextFactory);
         var students = new StudentService(failingDatabase ? new ThrowingContextFactory() : ContextFactory);
 
+        var import = new StudentImportService(ContextFactory, new StudentFileReader());
+
         return new GroupsPageViewModel(
             new GroupListViewModel(groups, _confirm, _log),
-            new StudentListViewModel(students, _confirm, _log));
+            new StudentListViewModel(students, _confirm, _log),
+            new StudentImportViewModel(import, new FakeFileDialogService(), _confirm, _log));
     }
 
     [Fact]
@@ -99,5 +102,3 @@ public class T18_GroupsPageViewModelTests : SqliteInMemoryTestBase
         Assert.Null(page.StartupErrorMessage);
     }
 }
-
-

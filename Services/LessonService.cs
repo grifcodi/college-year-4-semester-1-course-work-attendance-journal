@@ -1,4 +1,4 @@
-﻿using AttendanceJournal.Data;
+using AttendanceJournal.Data;
 using AttendanceJournal.Models;
 using AttendanceJournal.Services.Common;
 using AttendanceJournal.Services.Interfaces;
@@ -9,7 +9,7 @@ namespace AttendanceJournal.Services;
 public class LessonService(IDbContextFactory<AppDbContext> dbContextFactory)
     : ServiceBase(dbContextFactory), ILessonService
 {
-    public async Task<List<Lesson>> GetByMonthAsync(int groupId, int subjectId, int year, int month)
+    public async Task<List<Lesson>> GetByMonthAsync(int groupId, int? subjectId, int year, int month)
     {
         if (month is < 1 or > 12 || year is < 1 or > 9998)
             return [];
@@ -17,13 +17,24 @@ public class LessonService(IDbContextFactory<AppDbContext> dbContextFactory)
         var startDate = new DateOnly(year, month, 1);
         var endDate = startDate.AddMonths(1).AddDays(-1);
 
+        return await GetByRangeAsync(groupId, startDate, endDate, subjectId);
+    }
+
+    public async Task<List<Lesson>> GetByRangeAsync(int groupId, DateOnly fromDate, DateOnly toDate, int? subjectId = null)
+    {
         await using var context = await DbContextFactory.CreateDbContextAsync();
-        return await context.Lessons
+
+        var query = context.Lessons
             .AsNoTracking()
+            .Include(l => l.Subject)
             .Where(l => l.StudentGroupId == groupId
-                        && l.SubjectId == subjectId
-                        && l.Date >= startDate
-                        && l.Date <= endDate)
+                        && l.Date >= fromDate
+                        && l.Date <= toDate);
+
+        if (subjectId is int sid)
+            query = query.Where(l => l.SubjectId == sid);
+
+        return await query
             .OrderBy(l => l.Date)
             .ThenBy(l => l.PairNumber)
             .ToListAsync();
@@ -34,6 +45,8 @@ public class LessonService(IDbContextFactory<AppDbContext> dbContextFactory)
         await using var context = await DbContextFactory.CreateDbContextAsync();
         return await context.Lessons
             .AsNoTracking()
+            .Include(l => l.Subject)
+            .Include(l => l.StudentGroup)
             .FirstOrDefaultAsync(l => l.LessonId == lessonId);
     }
 

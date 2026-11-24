@@ -1,4 +1,4 @@
-﻿<Application xmlns="https://github.com/avaloniaui"
+<Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="using:AttendanceJournal"
              x:Class="AttendanceJournal.App"
@@ -16,12 +16,26 @@
                     <SolidColorBrush x:Key="ErrorBannerBorderBrush" Color="#F8B4B4" />
                     <SolidColorBrush x:Key="ErrorBannerTextBrush" Color="#9B1C1C" />
                     <SolidColorBrush x:Key="WarningBadgeBrush" Color="#B45309" />
+                    <SolidColorBrush x:Key="InfoBannerBackgroundBrush" Color="#E7F5EC" />
+                    <SolidColorBrush x:Key="InfoBannerBorderBrush" Color="#A7D7B8" />
+                    <SolidColorBrush x:Key="InfoBannerTextBrush" Color="#14532D" />
+                    <SolidColorBrush x:Key="StatusPresentTintBrush" Color="#2622C55E" />
+                    <SolidColorBrush x:Key="StatusAbsentTintBrush" Color="#33EF4444" />
+                    <SolidColorBrush x:Key="StatusLateTintBrush" Color="#33F59E0B" />
+                    <SolidColorBrush x:Key="StatusExcusedTintBrush" Color="#333B82F6" />
                 </ResourceDictionary>
                 <ResourceDictionary x:Key="Dark">
                     <SolidColorBrush x:Key="ErrorBannerBackgroundBrush" Color="#3F1D1D" />
                     <SolidColorBrush x:Key="ErrorBannerBorderBrush" Color="#7F1D1D" />
                     <SolidColorBrush x:Key="ErrorBannerTextBrush" Color="#FCA5A5" />
                     <SolidColorBrush x:Key="WarningBadgeBrush" Color="#FBBF24" />
+                    <SolidColorBrush x:Key="InfoBannerBackgroundBrush" Color="#16301F" />
+                    <SolidColorBrush x:Key="InfoBannerBorderBrush" Color="#2F6B44" />
+                    <SolidColorBrush x:Key="InfoBannerTextBrush" Color="#BBF7D0" />
+                    <SolidColorBrush x:Key="StatusPresentTintBrush" Color="#4022C55E" />
+                    <SolidColorBrush x:Key="StatusAbsentTintBrush" Color="#4DEF4444" />
+                    <SolidColorBrush x:Key="StatusLateTintBrush" Color="#4DF59E0B" />
+                    <SolidColorBrush x:Key="StatusExcusedTintBrush" Color="#4D3B82F6" />
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
         </ResourceDictionary>

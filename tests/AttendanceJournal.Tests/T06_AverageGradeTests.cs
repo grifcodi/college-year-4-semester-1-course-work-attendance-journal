@@ -1,4 +1,4 @@
-﻿using AttendanceJournal.Tests.TestHelpers;
+using AttendanceJournal.Tests.TestHelpers;
 
 namespace AttendanceJournal.Tests;
 

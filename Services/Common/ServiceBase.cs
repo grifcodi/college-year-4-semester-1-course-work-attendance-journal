@@ -1,4 +1,4 @@
-﻿using AttendanceJournal.Data;
+using AttendanceJournal.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace AttendanceJournal.Services.Common;
@@ -31,33 +31,25 @@ public abstract class ServiceBase(IDbContextFactory<AppDbContext> dbContextFacto
         params object[] errorArgs)
     {
         await using var context = await DbContextFactory.CreateDbContextAsync();
+
+        // Disposing a transaction that was not committed rolls it back, so no explicit
+        // RollbackAsync is needed: a failing rollback could otherwise hide the original error.
         await using var transaction = await context.Database.BeginTransactionAsync();
         try
         {
             var result = await operation(context);
-            if (!result.IsSuccess)
-            {
-                await transaction.RollbackAsync();
-                return result;
-            }
+            if (result.IsSuccess)
+                await transaction.CommitAsync();
 
-            await transaction.CommitAsync();
             return result;
         }
         catch (DbUpdateException ex) when (DatabaseErrorClassifier.IsUniqueConstraintViolation(ex) && uniqueConstraintErrorKey is not null)
         {
-            await transaction.RollbackAsync();
             return Result<T>.Failure(uniqueConstraintErrorKey, errorArgs);
         }
         catch (Exception ex) when (DatabaseErrorClassifier.ClassifyErrorKey(ex) is string errorKey)
         {
-            await transaction.RollbackAsync();
             return Result<T>.Failure(errorKey);
-        }
-        catch
-        {
-            await transaction.RollbackAsync();
-            throw;
         }
     }
 }

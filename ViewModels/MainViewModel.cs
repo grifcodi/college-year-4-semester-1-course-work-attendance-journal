@@ -1,4 +1,5 @@
 using AttendanceJournal.Services.Interfaces;
+using AttendanceJournal.ViewModels.Interfaces;
 using AttendanceJournal.ViewModels.Localization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -12,14 +13,25 @@ public partial class MainViewModel : ViewModelBase, IDisposable
 
     public MainViewModel(
         GroupsPageViewModel groupsPage,
+        SubjectsPageViewModel subjectsPage,
+        JournalPageViewModel journalPage,
+        MonthGridPageViewModel monthGridPage,
+        SummaryPageViewModel summaryPage,
+        AuditLogPageViewModel auditLogPage,
         SettingsPageViewModel settingsPage,
         ISettingService settingService)
     {
         GroupsPage = groupsPage;
+        SubjectsPage = subjectsPage;
+        JournalPage = journalPage;
+        MonthGridPage = monthGridPage;
+        SummaryPage = summaryPage;
+        AuditLogPage = auditLogPage;
         SettingsPage = settingsPage;
         _settingService = settingService;
         CurrentPage = GroupsPage;
 
+        MonthGridPage.OpenLessonRequested += OnOpenLessonRequested;
         LocalizationSource.Instance.PropertyChanged += OnLocalizationChanged;
     }
 
@@ -29,21 +41,39 @@ public partial class MainViewModel : ViewModelBase, IDisposable
     public string AppTitleText => Localizer.Translate(UiTextKeys.AppTitle);
     public string NavHeaderText => Localizer.Translate(UiTextKeys.NavHeader);
     public string NavGroupsText => Localizer.Translate(UiTextKeys.NavGroups);
+    public string NavSubjectsText => Localizer.Translate(UiTextKeys.NavSubjects);
+    public string NavJournalText => Localizer.Translate(UiTextKeys.NavJournal);
+    public string NavMonthGridText => Localizer.Translate(UiTextKeys.NavMonthGrid);
+    public string NavSummaryText => Localizer.Translate(UiTextKeys.NavSummary);
+    public string NavAuditLogText => Localizer.Translate(UiTextKeys.NavAuditLog);
     public string NavSettingsText => Localizer.Translate(UiTextKeys.NavSettings);
     public string RetryText => Localizer.Translate(UiTextKeys.RetryButton);
 
+    private static readonly string[] ShellTextProperties =
+    [
+        nameof(AppTitleText), nameof(NavHeaderText), nameof(NavGroupsText), nameof(NavSubjectsText),
+        nameof(NavJournalText), nameof(NavMonthGridText), nameof(NavSummaryText), nameof(NavAuditLogText),
+        nameof(NavSettingsText), nameof(RetryText),
+    ];
+
     private void OnLocalizationChanged(object? sender, PropertyChangedEventArgs e)
     {
-        OnPropertyChanged(nameof(AppTitleText));
-        OnPropertyChanged(nameof(NavHeaderText));
-        OnPropertyChanged(nameof(NavGroupsText));
-        OnPropertyChanged(nameof(NavSettingsText));
-        OnPropertyChanged(nameof(RetryText));
+        foreach (var name in ShellTextProperties)
+            OnPropertyChanged(name);
     }
 
-    public void Dispose() => LocalizationSource.Instance.PropertyChanged -= OnLocalizationChanged;
+    public void Dispose()
+    {
+        LocalizationSource.Instance.PropertyChanged -= OnLocalizationChanged;
+        MonthGridPage.OpenLessonRequested -= OnOpenLessonRequested;
+    }
 
     public GroupsPageViewModel GroupsPage { get; }
+    public SubjectsPageViewModel SubjectsPage { get; }
+    public JournalPageViewModel JournalPage { get; }
+    public MonthGridPageViewModel MonthGridPage { get; }
+    public SummaryPageViewModel SummaryPage { get; }
+    public AuditLogPageViewModel AuditLogPage { get; }
     public SettingsPageViewModel SettingsPage { get; }
 
     [ObservableProperty]
@@ -59,11 +89,38 @@ public partial class MainViewModel : ViewModelBase, IDisposable
     public void SetStartupFailure(string localizedMessage, Func<Task> retryAction) =>
         GroupsPage.SetStartupFailure(localizedMessage, retryAction);
 
-    [RelayCommand]
-    private void NavigateToGroups() => CurrentPage = GroupsPage;
+    private Task NavigateToAsync(ObservableObject page)
+    {
+        CurrentPage = page;
+        return page is IActivatablePage activatable ? activatable.ActivateAsync() : Task.CompletedTask;
+    }
+
+    private async void OnOpenLessonRequested(int lessonId)
+    {
+        // Show the journal without ActivateAsync: OpenLessonAsync loads the pickers itself.
+        // async void is acceptable for an event handler; OpenLessonAsync catches its own errors.
+        CurrentPage = JournalPage;
+        await JournalPage.OpenLessonAsync(lessonId);
+    }
 
     [RelayCommand]
-    private void NavigateToSettings() => CurrentPage = SettingsPage;
+    private Task NavigateToGroupsAsync() => NavigateToAsync(GroupsPage);
+
+    [RelayCommand]
+    private Task NavigateToSubjectsAsync() => NavigateToAsync(SubjectsPage);
+
+    [RelayCommand]
+    private Task NavigateToJournalAsync() => NavigateToAsync(JournalPage);
+
+    [RelayCommand]
+    private Task NavigateToMonthGridAsync() => NavigateToAsync(MonthGridPage);
+
+    [RelayCommand]
+    private Task NavigateToSummaryAsync() => NavigateToAsync(SummaryPage);
+
+    [RelayCommand]
+    private Task NavigateToAuditLogAsync() => NavigateToAsync(AuditLogPage);
+
+    [RelayCommand]
+    private Task NavigateToSettingsAsync() => NavigateToAsync(SettingsPage);
 }
-
-

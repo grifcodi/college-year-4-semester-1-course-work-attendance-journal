@@ -6,7 +6,37 @@
              x:Class="AttendanceJournal.Views.GroupsPageView"
              x:DataType="vm:GroupsPageViewModel">
 
-    <Grid ColumnDefinitions="360,16,*" Margin="16">
+    <Grid RowDefinitions="Auto,*">
+
+    <!-- Повідомлення імпорту (FR-11) -->
+    <StackPanel Grid.Row="0" Margin="16,16,16,0" DataContext="{Binding Import}" x:DataType="vm:StudentImportViewModel">
+        <!-- Банер помилки -->
+        <Border Background="{DynamicResource ErrorBannerBackgroundBrush}"
+                BorderBrush="{DynamicResource ErrorBannerBorderBrush}"
+                BorderThickness="1" CornerRadius="6" Padding="10,6" Margin="0,0,0,0"
+                IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+            <DockPanel>
+                <Button DockPanel.Dock="Right" Margin="8,0,0,0"
+                        Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_RetryButton]}"
+                        Command="{Binding RetryLastOperationCommand}"
+                        IsVisible="{Binding CanRetry}" />
+                <TextBlock Text="{Binding ErrorMessage}"
+                           Foreground="{DynamicResource ErrorBannerTextBrush}"
+                           FontSize="12" TextWrapping="Wrap" VerticalAlignment="Center" />
+            </DockPanel>
+        </Border>
+        <!-- Банер успішної операції -->
+        <Border Background="{DynamicResource InfoBannerBackgroundBrush}"
+                BorderBrush="{DynamicResource InfoBannerBorderBrush}"
+                BorderThickness="1" CornerRadius="6" Padding="10,6" Margin="0,0,0,0"
+                IsVisible="{Binding InfoMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+            <TextBlock Text="{Binding InfoMessage}"
+                       Foreground="{DynamicResource InfoBannerTextBrush}"
+                       FontSize="12" TextWrapping="Wrap" />
+        </Border>
+    </StackPanel>
+
+    <Grid Grid.Row="1" ColumnDefinitions="360,16,*" Margin="16">
 
         <!-- ЛІВА ПАНЕЛЬ: ГРУПИ -->
         <Border Grid.Column="0"
@@ -118,6 +148,9 @@
                 Padding="12">
             <Grid RowDefinitions="Auto,Auto,Auto,*">
                 <DockPanel Grid.Row="0" Margin="0,0,0,8">
+                    <Button DockPanel.Dock="Right" Margin="12,0,0,0"
+                            Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_ImportButton]}"
+                            Command="{Binding $parent[UserControl].((vm:GroupsPageViewModel)DataContext).ImportStudentsCommand}" />
                     <TextBlock Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_StudentsHeader]}"
                                FontSize="18"
                                FontWeight="Bold"
@@ -205,5 +238,53 @@
                 </ListBox>
             </Grid>
         </Border>
+    </Grid>
+
+    <!-- Перегляд імпорту: показує всі рядки з номерами та причинами перед підтвердженням -->
+    <Border Grid.Row="1" Margin="16"
+            DataContext="{Binding Import}" x:DataType="vm:StudentImportViewModel"
+            IsVisible="{Binding IsPreviewOpen}"
+            Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+            BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+            BorderThickness="1" CornerRadius="8" Padding="16"
+            BoxShadow="0 4 16 0 #40000000">
+        <DockPanel>
+            <TextBlock DockPanel.Dock="Top" Text="{Binding PreviewTitle}" FontSize="18" FontWeight="Bold" />
+            <TextBlock DockPanel.Dock="Top" Text="{Binding CountsText}" FontWeight="SemiBold" Margin="0,4,0,0" />
+            <TextBlock DockPanel.Dock="Top" Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_ImportHint]}" FontSize="12" TextWrapping="Wrap" Margin="0,4,0,8" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+
+            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="8" Margin="0,10,0,0" HorizontalAlignment="Right">
+                <Button Classes="accent" Content="{Binding ConfirmText}" Command="{Binding ConfirmCommand}" IsEnabled="{Binding CanConfirm}" />
+                <Button Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_CancelButton]}" Command="{Binding CancelCommand}" />
+            </StackPanel>
+
+            <Grid DockPanel.Dock="Top" ColumnDefinitions="70,*,160,*" Margin="0,0,16,4">
+                <TextBlock Grid.Column="0" Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_ImportColumnRow]}" FontWeight="SemiBold" />
+                <TextBlock Grid.Column="1" Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_ColumnStudent]}" FontWeight="SemiBold" />
+                <TextBlock Grid.Column="2" Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_ColumnGroup]}" FontWeight="SemiBold" />
+                <TextBlock Grid.Column="3" Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_ImportColumnResult]}" FontWeight="SemiBold" />
+            </Grid>
+            <ScrollViewer>
+                <ItemsControl ItemsSource="{Binding Rows}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:ImportRowViewModel">
+                            <Border BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="0,0,0,1" Padding="0,3">
+                                <Grid ColumnDefinitions="70,*,160,*">
+                                    <TextBlock Grid.Column="0" Text="{Binding RowNumber}" />
+                                    <TextBlock Grid.Column="1" Text="{Binding FullName}" TextWrapping="Wrap" />
+                                    <TextBlock Grid.Column="2" Text="{Binding GroupName}" TextWrapping="Wrap" />
+                                    <TextBlock Grid.Column="3" Text="{Binding ResultText}" TextWrapping="Wrap" FontSize="12"
+                                               IsVisible="{Binding !IsProblem}" />
+                                    <TextBlock Grid.Column="3" Text="{Binding ResultText}" TextWrapping="Wrap" FontSize="12"
+                                               FontWeight="SemiBold" Foreground="{DynamicResource WarningBadgeBrush}"
+                                               IsVisible="{Binding IsProblem}" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </DockPanel>
+    </Border>
     </Grid>
 </UserControl>

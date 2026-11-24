@@ -1,4 +1,4 @@
-﻿namespace AttendanceJournal.Services.Common;
+namespace AttendanceJournal.Services.Common;
 
 public static class ErrorKeys
 {
@@ -37,6 +37,25 @@ public static class ErrorKeys
     public const string AttendanceStudentWrongGroup = "Err_Attendance_StudentWrongGroup";
     public const string AttendanceVersionNotFound = "Err_Attendance_VersionNotFound";
     public const string AttendanceNoChange = "Err_Attendance_NoChange";
+    public const string AttendanceDuplicateStudentInBatch = "Err_Attendance_DuplicateStudentInBatch";
+
+    // Import of students (FR-11)
+    public const string ImportUnsupportedFormat = "Err_Import_UnsupportedFormat";
+    public const string ImportFileEmpty = "Err_Import_FileEmpty";
+    public const string ImportFileNotUtf8 = "Err_Import_FileNotUtf8";
+    public const string ImportFileUnreadable = "Err_Import_FileUnreadable";
+    public const string ImportMissingFullNameColumn = "Err_Import_MissingFullNameColumn";
+    public const string ImportNoTargetGroup = "Err_Import_NoTargetGroup";
+    public const string ImportNothingToImport = "Err_Import_NothingToImport";
+    public const string ImportRowNameRequired = "Err_Import_RowNameRequired";
+    public const string ImportRowNameTooLong = "Err_Import_RowNameTooLong";
+    public const string ImportRowGroupNameTooLong = "Err_Import_RowGroupNameTooLong";
+    public const string ImportRowDuplicateInFile = "Err_Import_RowDuplicateInFile";
+    public const string ImportRowDuplicateInDatabase = "Err_Import_RowDuplicateInDatabase";
+
+    // Export of attendance (FR-10)
+    public const string ExportInvalidRange = "Err_Export_InvalidRange";
+    public const string ExportWriteFailed = "Err_Export_WriteFailed";
 
     public const string UnexpectedError = "Err_Unexpected";
 }

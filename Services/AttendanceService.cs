@@ -66,108 +66,176 @@ public class AttendanceService(IDbContextFactory<AppDbContext> dbContextFactory)
         string? note,
         string? reason)
     {
-        if (grade is < 0 or > 100)
-            return Result<AttendanceCellDto>.Failure(ErrorKeys.AttendanceInvalidGrade);
+        var input = new MarkInput(studentId, status, grade, note);
+        var validation = ValidateInput(input, reason);
+        if (!validation.IsSuccess)
+            return Result<AttendanceCellDto>.Failure(validation.ErrorKey!, validation.ErrorArgs);
 
-        var normalizedNote = string.IsNullOrWhiteSpace(note) ? null : note.Trim();
+        var (normalizedNote, normalizedReason) = validation.Value;
+
+        return await ExecuteInTransactionAsync(context =>
+            SaveMarkInContextAsync(context, lessonId, input with { Note = normalizedNote }, normalizedReason));
+    }
+
+    public async Task<Result<List<AttendanceCellDto>>> SaveMarksAsync(
+        int lessonId,
+        IReadOnlyList<MarkInput> marks,
+        string? reason)
+    {
+        if (marks.Count == 0)
+            return Result<List<AttendanceCellDto>>.Success([]);
+
+        if (marks.Select(m => m.StudentId).Distinct().Count() != marks.Count)
+            return Result<List<AttendanceCellDto>>.Failure(ErrorKeys.AttendanceDuplicateStudentInBatch);
+
+        var normalized = new List<MarkInput>(marks.Count);
+        string? normalizedReason = null;
+        foreach (var mark in marks)
+        {
+            var validation = ValidateInput(mark, reason);
+            if (!validation.IsSuccess)
+                return Result<List<AttendanceCellDto>>.Failure(validation.ErrorKey!, validation.ErrorArgs);
+
+            normalized.Add(mark with { Note = validation.Value.Note });
+            normalizedReason = validation.Value.Reason;
+        }
+
+        // One user action = one transaction (NFR-02): if any mark fails, none is saved.
+        return await ExecuteInTransactionAsync(async context =>
+        {
+            var saved = new List<AttendanceCellDto>(normalized.Count);
+            foreach (var mark in normalized)
+            {
+                var result = await SaveMarkInContextAsync(context, lessonId, mark, normalizedReason);
+                if (!result.IsSuccess)
+                    return Result<List<AttendanceCellDto>>.Failure(result.ErrorKey!, result.ErrorArgs);
+
+                saved.Add(result.Value!);
+            }
+
+            return Result<List<AttendanceCellDto>>.Success(saved);
+        });
+    }
+
+    private static Result<(string? Note, string? Reason)> ValidateInput(MarkInput input, string? reason)
+    {
+        if (input.Grade is < 0 or > 100)
+            return Result<(string?, string?)>.Failure(ErrorKeys.AttendanceInvalidGrade);
+
+        if (!Enum.IsDefined(input.Status))
+            return Result<(string?, string?)>.Failure(ErrorKeys.UnexpectedError);
+
+        var normalizedNote = string.IsNullOrWhiteSpace(input.Note) ? null : input.Note.Trim();
         if (normalizedNote?.Length > ValidationConstants.NoteMaxLength)
-            return Result<AttendanceCellDto>.Failure(ErrorKeys.AttendanceNoteTooLong, ValidationConstants.NoteMaxLength);
+            return Result<(string?, string?)>.Failure(ErrorKeys.AttendanceNoteTooLong, ValidationConstants.NoteMaxLength);
 
         var normalizedReason = string.IsNullOrWhiteSpace(reason) ? null : reason.Trim();
         if (normalizedReason?.Length > ValidationConstants.ReasonMaxLength)
-            return Result<AttendanceCellDto>.Failure(ErrorKeys.AttendanceReasonTooLong, ValidationConstants.ReasonMaxLength);
+            return Result<(string?, string?)>.Failure(ErrorKeys.AttendanceReasonTooLong, ValidationConstants.ReasonMaxLength);
 
-        return await ExecuteInTransactionAsync(async context =>
+        return Result<(string?, string?)>.Success((normalizedNote, normalizedReason));
+    }
+
+    /// <summary>
+    /// Appends a version for one student. Runs inside the caller's transaction;
+    /// <paramref name="mark"/>.Note and <paramref name="normalizedReason"/> are already trimmed.
+    /// </summary>
+    private static async Task<Result<AttendanceCellDto>> SaveMarkInContextAsync(
+        AppDbContext context,
+        int lessonId,
+        MarkInput mark,
+        string? normalizedReason)
+    {
+        var (studentId, status, grade, normalizedNote) = mark;
+
+        var lesson = await context.Lessons.FirstOrDefaultAsync(l => l.LessonId == lessonId);
+        if (lesson is null)
+            return Result<AttendanceCellDto>.Failure(ErrorKeys.EntityNotFound);
+
+        var student = await context.Students.FirstOrDefaultAsync(s => s.StudentId == studentId);
+        if (student is null)
+            return Result<AttendanceCellDto>.Failure(ErrorKeys.EntityNotFound);
+
+        if (student.StudentGroupId != lesson.StudentGroupId)
+            return Result<AttendanceCellDto>.Failure(ErrorKeys.AttendanceStudentWrongGroup);
+
+        var record = await context.AttendanceRecords
+            .Include(r => r.Versions)
+            .FirstOrDefaultAsync(r => r.LessonId == lessonId && r.StudentId == studentId);
+
+        if (record is null)
         {
-            var lesson = await context.Lessons.FirstOrDefaultAsync(l => l.LessonId == lessonId);
-            if (lesson is null)
-                return Result<AttendanceCellDto>.Failure(ErrorKeys.EntityNotFound);
+            if (student.IsArchived)
+                return Result<AttendanceCellDto>.Failure(ErrorKeys.AttendanceStudentArchived);
 
-            var student = await context.Students.FirstOrDefaultAsync(s => s.StudentId == studentId);
-            if (student is null)
-                return Result<AttendanceCellDto>.Failure(ErrorKeys.EntityNotFound);
-
-            if (student.StudentGroupId != lesson.StudentGroupId)
-                return Result<AttendanceCellDto>.Failure(ErrorKeys.AttendanceStudentWrongGroup);
-
-            var record = await context.AttendanceRecords
-                .Include(r => r.Versions)
-                .FirstOrDefaultAsync(r => r.LessonId == lessonId && r.StudentId == studentId);
-
-            if (record is null)
+            record = new AttendanceRecord
             {
-                if (student.IsArchived)
-                    return Result<AttendanceCellDto>.Failure(ErrorKeys.AttendanceStudentArchived);
+                LessonId = lessonId,
+                StudentId = studentId
+            };
+            context.AttendanceRecords.Add(record);
+            await context.SaveChangesAsync();
+        }
 
-                record = new AttendanceRecord
-                {
-                    LessonId = lessonId,
-                    StudentId = studentId
-                };
-                context.AttendanceRecords.Add(record);
-                await context.SaveChangesAsync();
-            }
+        var currentMaxVersion = record.Versions.Count == 0
+            ? 0
+            : record.Versions.Max(v => v.VersionNumber);
 
-            var currentMaxVersion = record.Versions.Count == 0
-                ? 0
-                : record.Versions.Max(v => v.VersionNumber);
+        if (currentMaxVersion > 0)
+        {
+            var current = record.Versions.First(v => v.VersionNumber == currentMaxVersion);
+            if (current.Status == status && current.Grade == grade && current.Note == normalizedNote)
+                return Result<AttendanceCellDto>.Failure(ErrorKeys.AttendanceNoChange);
 
-            if (currentMaxVersion > 0)
+            if (string.IsNullOrEmpty(normalizedReason))
+                return Result<AttendanceCellDto>.Failure(ErrorKeys.AttendanceReasonRequired);
+
+            if (normalizedReason.Length < ValidationConstants.ReasonMinLength)
+                return Result<AttendanceCellDto>.Failure(
+                    ErrorKeys.AttendanceReasonTooShort,
+                    ValidationConstants.ReasonMinLength);
+        }
+
+        var storedReason = currentMaxVersion == 0 ? null : normalizedReason;
+        var nextVersionNumber = currentMaxVersion + 1;
+        var newVersion = new AttendanceVersion
+        {
+            AttendanceRecordId = record.AttendanceRecordId,
+            VersionNumber = nextVersionNumber,
+            Status = status,
+            Grade = grade,
+            Note = normalizedNote,
+            Reason = storedReason,
+            TimeStamp = DateTime.UtcNow
+        };
+
+        context.AttendanceVersions.Add(newVersion);
+
+        context.AuditEntries.Add(AuditHelper.CreateEntry(
+            AuditAction.MarkAttendance,
+            AuditEntityType.AttendanceRecord,
+            record.AttendanceRecordId,
+            new
             {
-                var current = record.Versions.First(v => v.VersionNumber == currentMaxVersion);
-                if (current.Status == status && current.Grade == grade && current.Note == normalizedNote)
-                    return Result<AttendanceCellDto>.Failure(ErrorKeys.AttendanceNoChange);
-
-                if (string.IsNullOrEmpty(normalizedReason))
-                    return Result<AttendanceCellDto>.Failure(ErrorKeys.AttendanceReasonRequired);
-
-                if (normalizedReason.Length < ValidationConstants.ReasonMinLength)
-                    return Result<AttendanceCellDto>.Failure(
-                        ErrorKeys.AttendanceReasonTooShort,
-                        ValidationConstants.ReasonMinLength);
-            }
-
-            var storedReason = currentMaxVersion == 0 ? null : normalizedReason;
-            var nextVersionNumber = currentMaxVersion + 1;
-            var newVersion = new AttendanceVersion
-            {
-                AttendanceRecordId = record.AttendanceRecordId,
-                VersionNumber = nextVersionNumber,
-                Status = status,
+                LessonId = lessonId,
+                StudentId = studentId,
+                Version = nextVersionNumber,
+                Status = status.ToString(),
                 Grade = grade,
                 Note = normalizedNote,
-                Reason = storedReason,
-                TimeStamp = DateTime.UtcNow
-            };
+                Reason = storedReason
+            }));
 
-            context.AttendanceVersions.Add(newVersion);
+        await context.SaveChangesAsync();
 
-            context.AuditEntries.Add(AuditHelper.CreateEntry(
-                AuditAction.MarkAttendance,
-                AuditEntityType.AttendanceRecord,
-                record.AttendanceRecordId,
-                new
-                {
-                    LessonId = lessonId,
-                    StudentId = studentId,
-                    Version = nextVersionNumber,
-                    Status = status.ToString(),
-                    Grade = grade,
-                    Note = normalizedNote,
-                    Reason = storedReason
-                }));
-
-            await context.SaveChangesAsync();
-
-            return Result<AttendanceCellDto>.Success(new AttendanceCellDto(
-                record.AttendanceRecordId,
-                lessonId,
-                studentId,
-                nextVersionNumber,
-                status,
-                grade,
-                normalizedNote));
-        });
+        return Result<AttendanceCellDto>.Success(new AttendanceCellDto(
+            record.AttendanceRecordId,
+            lessonId,
+            studentId,
+            nextVersionNumber,
+            status,
+            grade,
+            normalizedNote));
     }
 
     public async Task<Result<int>> MarkAllPresentAsync(int lessonId)
@@ -356,5 +424,3 @@ public class AttendanceService(IDbContextFactory<AppDbContext> dbContextFactory)
             .ToListAsync();
     }
 }
-
-

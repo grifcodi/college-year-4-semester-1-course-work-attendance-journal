@@ -1,0 +1,221 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AttendanceJournal.ViewModels"
+             xmlns:models="using:AttendanceJournal.Models"
+             xmlns:loc="using:AttendanceJournal.ViewModels.Localization"
+             x:Class="AttendanceJournal.Views.JournalPageView"
+             x:DataType="vm:JournalPageViewModel">
+
+    <UserControl.Styles>
+        <!-- Light tint behind the selected status; the letter itself carries the meaning (NFR-04). -->
+        <Style Selector="RadioButton.status">
+            <Setter Property="MinWidth" Value="0" />
+            <Setter Property="Padding" Value="4,0" />
+            <Setter Property="Margin" Value="0,0,6,0" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+    </UserControl.Styles>
+
+    <Grid ColumnDefinitions="300,16,*" Margin="16">
+
+        <!-- ЛІВА ПАНЕЛЬ: група, дата, заняття -->
+        <Border Grid.Column="0" Background="{DynamicResource SystemControlBackgroundAltHighBrush}" BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="1" CornerRadius="8" Padding="12">
+            <ScrollViewer>
+                <StackPanel Spacing="6">
+                    <TextBlock Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_JournalHeader]}" FontSize="18" FontWeight="Bold" Margin="0,0,0,4" />
+
+                    <TextBlock Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_LabelGroup]}" />
+                    <ComboBox ItemsSource="{Binding Groups}" SelectedItem="{Binding SelectedGroup}" HorizontalAlignment="Stretch">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate x:DataType="models:StudentGroup">
+                                <TextBlock Text="{Binding Name}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+
+                    <TextBlock Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_LabelDate]}" />
+                    <CalendarDatePicker SelectedDate="{Binding SelectedDate}" HorizontalAlignment="Stretch" />
+
+                    <TextBlock Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_LessonsOnDateHeader]}" FontWeight="SemiBold" Margin="0,8,0,0" />
+                    <ListBox ItemsSource="{Binding Lessons}" SelectedItem="{Binding SelectedLesson}" MaxHeight="220" Background="Transparent">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate x:DataType="vm:LessonItemViewModel">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextWrapping="Wrap" />
+                                    <TextBlock Text="{Binding Topic}" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                               IsVisible="{Binding Topic, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                    <TextBlock Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_NoLessonsOnDate]}" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                               IsVisible="{Binding HasNoLessons}" />
+
+                    <Separator Margin="0,8" />
+
+                    <TextBlock Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_NewLessonHeader]}" FontWeight="SemiBold" />
+                    <TextBlock Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_LabelSubject]}" />
+                    <ComboBox ItemsSource="{Binding Subjects}" SelectedItem="{Binding NewLessonSubject}" HorizontalAlignment="Stretch">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate x:DataType="models:Subject">
+                                <TextBlock Text="{Binding Name}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <TextBlock Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_LabelPair]}" />
+                    <ComboBox ItemsSource="{Binding PairNumbers}" SelectedItem="{Binding NewLessonPair}" MinWidth="80" />
+                    <TextBox PlaceholderText="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_TopicPlaceholder]}" Text="{Binding NewLessonTopic}" MaxLength="250" />
+                    <Button Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_CreateLessonButton]}" Command="{Binding CreateLessonCommand}"
+                            Classes="accent" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <!-- ПРАВА ПАНЕЛЬ: відмітки обраного заняття -->
+        <Border Grid.Column="2" Background="{DynamicResource SystemControlBackgroundAltHighBrush}" BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="1" CornerRadius="8" Padding="12">
+            <Grid RowDefinitions="Auto,Auto,Auto,Auto,*,Auto,Auto" ColumnDefinitions="*,Auto">
+
+                <StackPanel Grid.Row="0" Grid.ColumnSpan="2">
+                    <!-- Банер помилки -->
+                    <Border Background="{DynamicResource ErrorBannerBackgroundBrush}"
+                            BorderBrush="{DynamicResource ErrorBannerBorderBrush}"
+                            BorderThickness="1" CornerRadius="6" Padding="10,6" Margin="0,0,0,8"
+                            IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                        <DockPanel>
+                            <Button DockPanel.Dock="Right" Margin="8,0,0,0"
+                                    Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_RetryButton]}"
+                                    Command="{Binding RetryLastOperationCommand}"
+                                    IsVisible="{Binding CanRetry}" />
+                            <TextBlock Text="{Binding ErrorMessage}"
+                                       Foreground="{DynamicResource ErrorBannerTextBrush}"
+                                       FontSize="12" TextWrapping="Wrap" VerticalAlignment="Center" />
+                        </DockPanel>
+                    </Border>
+                    <!-- Банер успішної операції -->
+                    <Border Background="{DynamicResource InfoBannerBackgroundBrush}"
+                            BorderBrush="{DynamicResource InfoBannerBorderBrush}"
+                            BorderThickness="1" CornerRadius="6" Padding="10,6" Margin="0,0,0,8"
+                            IsVisible="{Binding InfoMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                        <TextBlock Text="{Binding InfoMessage}"
+                                   Foreground="{DynamicResource InfoBannerTextBrush}"
+                                   FontSize="12" TextWrapping="Wrap" />
+                    </Border>
+                </StackPanel>
+
+                <TextBlock Grid.Row="1" Grid.ColumnSpan="2" Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_SelectLessonHint]}" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                           TextWrapping="Wrap" Margin="0,8" IsVisible="{Binding !HasLesson}" />
+
+                <!-- Тема заняття -->
+                <Grid Grid.Row="1" Grid.ColumnSpan="2" ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,8" IsVisible="{Binding HasLesson}">
+                    <TextBlock Grid.Column="0" Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_LabelTopic]}" VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <TextBox Grid.Column="1" Text="{Binding TopicInput}" PlaceholderText="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_TopicPlaceholder]}" MaxLength="250" />
+                    <Button Grid.Column="2" Margin="8,0,0,0" Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_SaveTopicButton]}" Command="{Binding SaveTopicCommand}" />
+                </Grid>
+
+                <!-- Панель дій -->
+                <WrapPanel Grid.Row="2" Grid.ColumnSpan="2" Margin="0,0,0,8" IsVisible="{Binding HasLesson}">
+                    <Button Margin="0,0,8,4" Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_MarkAllPresentButton]}" Command="{Binding MarkAllPresentCommand}" />
+                    <Button Margin="0,0,8,4" Classes="accent" Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_SaveMarksButton]}" Command="{Binding SaveMarksCommand}"
+                            IsEnabled="{Binding HasUnsavedChanges}" />
+                    <Button Margin="0,0,8,4" Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_DiscardChangesButton]}" Command="{Binding DiscardChangesCommand}"
+                            IsEnabled="{Binding HasUnsavedChanges}" />
+                    <TextBlock Text="{Binding UnsavedText}" VerticalAlignment="Center" FontWeight="SemiBold"
+                               Foreground="{DynamicResource WarningBadgeBrush}" IsVisible="{Binding HasUnsavedChanges}" />
+                </WrapPanel>
+
+                <!-- Заголовки колонок -->
+                <Grid Grid.Row="3" Grid.Column="0" ColumnDefinitions="*,190,120,72,*,90" Margin="4,0,4,4" IsVisible="{Binding HasLesson}">
+                    <TextBlock Grid.Column="0" Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_ColumnStudent]}" FontWeight="SemiBold" />
+                    <TextBlock Grid.Column="1" Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_ColumnStatus]}" FontWeight="SemiBold" />
+                    <TextBlock Grid.Column="3" Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_ColumnGrade]}" FontWeight="SemiBold" />
+                    <TextBlock Grid.Column="4" Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_ColumnComment]}" FontWeight="SemiBold" Margin="8,0,0,0" />
+                </Grid>
+
+                <!-- Рядки студентів: ItemsControl, щоб Tab ходив по полях без захоплення списком (NFR-03) -->
+                <ScrollViewer Grid.Row="4" Grid.Column="0" IsVisible="{Binding HasLesson}">
+                    <ItemsControl ItemsSource="{Binding Rows}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:MarkRowViewModel">
+                                <Border BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="0,0,0,1" Padding="4,4">
+                                    <Grid ColumnDefinitions="*,190,120,72,*,90" RowDefinitions="Auto,Auto">
+                                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding FullName}" TextWrapping="Wrap" />
+                                            <TextBlock Text="{Binding SavedVersionText}" FontSize="11" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                                        </StackPanel>
+
+                                        <!-- Чотири статуси: кнопки з літерами, повна назва в підказці і поруч -->
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                            <RadioButton Classes="status" Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_LetterPresent]}" ToolTip.Tip="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_StatusPresent]}" IsChecked="{Binding IsPresent}" />
+                                            <RadioButton Classes="status" Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_LetterAbsent]}" ToolTip.Tip="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_StatusAbsent]}" IsChecked="{Binding IsAbsent}" />
+                                            <RadioButton Classes="status" Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_LetterLate]}" ToolTip.Tip="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_StatusLate]}" IsChecked="{Binding IsLate}" />
+                                            <RadioButton Classes="status" Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_LetterExcused]}" ToolTip.Tip="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_StatusExcused]}" IsChecked="{Binding IsExcused}" />
+                                        </StackPanel>
+                                        <TextBlock Grid.Column="2" Text="{Binding StatusName}" VerticalAlignment="Center" FontSize="12" TextWrapping="Wrap" />
+
+                                        <TextBox Grid.Column="3" Text="{Binding GradeText}" PlaceholderText="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_GradePlaceholder]}"
+                                                 MaxLength="3" VerticalAlignment="Center" />
+                                        <TextBox Grid.Column="4" Text="{Binding NoteText}" PlaceholderText="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_CommentPlaceholder]}"
+                                                 MaxLength="500" Margin="8,0,0,0" VerticalAlignment="Center" />
+                                        <Button Grid.Column="5" Margin="8,0,0,0" Padding="8,4" VerticalAlignment="Center" HorizontalAlignment="Right"
+                                                Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_HistoryButton]}"
+                                                IsVisible="{Binding HasSavedMark}"
+                                                Command="{Binding $parent[UserControl].((vm:JournalPageViewModel)DataContext).ShowHistoryCommand}"
+                                                CommandParameter="{Binding}" />
+
+                                        <TextBlock Grid.Row="1" Grid.ColumnSpan="6" Text="{Binding RowError}"
+                                                   Foreground="{DynamicResource ErrorBannerTextBrush}" FontSize="12" TextWrapping="Wrap"
+                                                   IsVisible="{Binding HasRowError}" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+
+                <!-- Історія відмітки (FR-07, FR-16) -->
+                <Border Grid.Row="3" Grid.RowSpan="2" Grid.Column="1" Width="300" Margin="12,0,0,0" Padding="10"
+                        BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="1" CornerRadius="6"
+                        IsVisible="{Binding IsHistoryOpen}">
+                    <DockPanel>
+                        <DockPanel DockPanel.Dock="Top" Margin="0,0,0,8">
+                            <Button DockPanel.Dock="Right" Padding="8,2" Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_CloseButton]}" Command="{Binding CloseHistoryCommand}" />
+                            <TextBlock Text="{Binding HistoryTitle}" FontWeight="SemiBold" TextWrapping="Wrap" VerticalAlignment="Center" />
+                        </DockPanel>
+                        <ScrollViewer>
+                            <ItemsControl ItemsSource="{Binding HistoryItems}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:HistoryItemViewModel">
+                                        <Border BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="0,0,0,1" Padding="0,6">
+                                            <StackPanel Spacing="2">
+                                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                                    <TextBlock Text="{Binding Title}" FontWeight="SemiBold" />
+                                                    <TextBlock Text="{Binding CurrentBadge}" FontSize="11" Foreground="{DynamicResource WarningBadgeBrush}" VerticalAlignment="Center" />
+                                                </StackPanel>
+                                                <TextBlock Text="{Binding TimeText}" FontSize="11" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                                                <TextBlock Text="{Binding Details}" TextWrapping="Wrap" />
+                                                <TextBlock Text="{Binding ReasonText}" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                                                <Button Padding="8,2" Margin="0,4,0,0" Content="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_RestoreButton]}"
+                                                        IsVisible="{Binding CanRestore}"
+                                                        Command="{Binding $parent[UserControl].((vm:JournalPageViewModel)DataContext).RestoreVersionCommand}"
+                                                        CommandParameter="{Binding}" />
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </DockPanel>
+                </Border>
+
+                <!-- Причина зміни збережених відміток (FR-07) -->
+                <StackPanel Grid.Row="5" Grid.ColumnSpan="2" Spacing="4" Margin="0,8,0,0" IsVisible="{Binding IsReasonRequired}">
+                    <TextBlock Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_ReasonLabel]}" FontWeight="SemiBold" TextWrapping="Wrap" />
+                    <TextBox Text="{Binding ReasonInput}" PlaceholderText="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_ReasonPlaceholder]}" MaxLength="500" />
+                </StackPanel>
+
+                <TextBlock Grid.Row="6" Grid.ColumnSpan="2" Text="{Binding Source={x:Static loc:LocalizationSource.Instance}, Path=[Ui_ShortcutsHint]}" FontSize="11" TextWrapping="Wrap"
+                           Margin="0,8,0,0" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>
