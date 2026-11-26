@@ -24,7 +24,7 @@
 ## Збирання та запуск
 
 ```powershell
-git clone <url-репозиторію>
+git clone https://github.com/grifcodi/college-year-4-semester-1-course-work-attendance-journal.git
 cd AttendanceJournal
 dotnet build
 dotnet run --project AttendanceJournal.csproj
